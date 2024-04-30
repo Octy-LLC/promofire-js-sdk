@@ -1,0 +1,14 @@
+{
+  "name": "@octy/promofire-js-sdk",
+  "version": "0.2.0",
+  "description": "promofire javascript sdk",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": ["promofire", "sdk"],
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.4.2"
+  }
+}

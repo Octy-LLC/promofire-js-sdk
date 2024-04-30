@@ -1,0 +1,35 @@
+import { CodeTemplate } from './aggregates/code-template.aggregate';
+import { Client } from './client';
+import { IAuthTokens } from './contracts/auth/auth-tokens.contract';
+import { UUID } from './contracts/utils/uuid.contract';
+import { CreateCodeDto } from './dto/codes/create-code.dto';
+import { CreateCodesDto } from './dto/codes/create-codes.dto';
+import { FilterCodeDto } from './dto/codes/filter-code.dto';
+import { RedeemCodeDto } from './dto/codes/redeem-code.dto';
+import { UpdateCodeDto } from './dto/codes/update-code.dto';
+import { CreateCustomerDto } from './dto/customers/create-customer.dto';
+import { DateRange } from './dto/util/date-range.dto';
+import { SearchCodeTemplatesDto } from './dto/util/search-code-templates.dto';
+import { CodeRedeem } from './entities/code-redeem.entity';
+import { Code } from './entities/code.entity';
+export { Client };
+export declare class Promofire {
+    private client;
+    constructor(tenant: string, secret: string);
+    identify(userId: string): Promise<Promofire>;
+    getTemplates(options: SearchCodeTemplatesDto): Promise<CodeTemplate[]>;
+    getTemplateById(templateId: UUID): Promise<CodeTemplate | null>;
+    getCodes(options: FilterCodeDto): Promise<Code[] | null>;
+    getCodeByValue(codeValue: string): Promise<Code | null>;
+    createCode(createCodeDto: CreateCodeDto): Promise<Code>;
+    createBatchCode(createCodesDto: CreateCodesDto): Promise<Code[]>;
+    updateCode(updateCodeDto: UpdateCodeDto): Promise<Code>;
+    redeemCode(redeemCodeDto: RedeemCodeDto): Promise<void>;
+    getCodesByTemplate(templateId: string): Promise<Code[]>;
+    filterCodes(filterDto: FilterCodeDto): Promise<Code[]>;
+    createCustomer(createDto: CreateCustomerDto): Promise<IAuthTokens>;
+    getMyRedeemedCodes(dataRange: DateRange): Promise<CodeRedeem[]>;
+    getCodeRedeemesOwnedByMe(dataRange: DateRange): Promise<CodeRedeem[]>;
+    getCodeRedeemesRedeemedByCustomer(customerId: UUID, dataRange: DateRange): Promise<CodeRedeem[]>;
+    deleteMe(): Promise<void>;
+}
