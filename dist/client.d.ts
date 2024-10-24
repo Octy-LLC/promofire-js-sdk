@@ -4,7 +4,7 @@ export declare class Client implements IClientState {
     tenant: string;
     secret: string;
     constructor(tenant: string, secret: string);
-    authenticate(userId: string): Promise<AuthenticatedClient>;
+    authenticate(): Promise<AuthenticatedClient>;
     request(): Promise<never>;
 }
 export declare class AuthenticatedClient implements IClientState {

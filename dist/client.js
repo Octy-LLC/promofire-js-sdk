@@ -10,14 +10,27 @@ class Client {
         this.tenant = tenant;
         this.secret = secret;
     }
-    async authenticate(userId) {
-        const url = new URL('/auth/sign-in/sdk', urls_contract_1.BASE_URL);
+    async authenticate() {
+        const url = new URL('/auth/sdk', urls_contract_1.BASE_URL);
+        const presetUrl = new URL('/customers/preset', urls_contract_1.BASE_URL);
         const { accessToken } = await fetch(url, {
             method: http_methods_enum_1.HttpMethods.POST,
-            body: JSON.stringify({ tenant: this.tenant, secret: this.secret, sub: userId }),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ tenant: this.tenant, secret: this.secret }),
         })
             .then(async (response) => await response.json());
-        const client = new AuthenticatedClient(this.tenant, this.secret, accessToken);
+        const data = await fetch(presetUrl, {
+            method: http_methods_enum_1.HttpMethods.POST,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({ platform: 'WEB' }),
+        })
+            .then(async (response) => await response.json());
+        const client = new AuthenticatedClient(this.tenant, this.secret, data.accessToken);
         return client;
     }
     ;
@@ -35,15 +48,21 @@ class AuthenticatedClient {
     async authenticate() {
         throw new already_authenticated_error_1.AlreadyAuthenticated;
     }
-    request(path, method, body) {
+    async request(path, method, body) {
         const url = new URL(path, urls_contract_1.BASE_URL);
-        const request = fetch(url, {
-            headers: { 'Authorization': `Bearer ${this.token}` },
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': `Bearer ${this.token}`,
+                'Content-Type': 'application/json',
+            },
             method,
-            body: JSON.stringify(body),
-        })
-            .then(async (response) => await response.json());
-        return request;
+            body: body ? JSON.stringify(body) : undefined,
+        });
+        if (response.status === 204) {
+            return undefined;
+        }
+        const responseData = await response.json();
+        return responseData;
     }
 }
 exports.AuthenticatedClient = AuthenticatedClient;

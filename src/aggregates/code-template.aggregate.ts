@@ -6,14 +6,20 @@ export class CodeTemplate {
   id: UUID;
 
   name: string;
-  creator: UUID;
+  // creator: { id: UUID };
+  creatorId: UUID;
   createdAt: string;
   hasMutablePayload: boolean;
   amount: number;
-  isUsableByCustomers: boolean;
-  updatesHistory: UUID;
+  isUsableByCustomers?: boolean;
+  updatesHistory?: UUID;
   ttl: number;
   status: CodeTemplateStatuses;
   description: string;
   payload: ICodePayload;
+}
+
+export class CodeTemplatesDto {
+  total: number;
+  templates: CodeTemplate[];
 }

@@ -1,7 +1,5 @@
-import { UUID } from '../../contracts/utils/uuid.contract';
 import { Platforms } from '../../contracts/enums/platforms.enum';
 export declare class CreateCustomerDto {
-    tenant: string;
     country: string;
     platform: Platforms;
     device: string;
@@ -9,7 +7,6 @@ export declare class CreateCustomerDto {
     appBuild: string;
     appVersion: string;
     sdkVersion: string;
-    id?: UUID;
     tenantAssignedId?: string;
     firstName?: string;
     lastName?: string;

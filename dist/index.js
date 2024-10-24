@@ -8,9 +8,16 @@ class Promofire {
     constructor(tenant, secret) {
         this.client = new client_1.Client(tenant, secret);
     }
-    async identify(userId) {
-        this.client = await this.client.authenticate(userId);
+    async identify() {
+        this.client = await this.client.authenticate();
+        console.log('Client: ', this.client);
         return this;
+    }
+    async createTemplate(createTemplateDto) {
+        return await this.client.request('/code-templates', http_methods_enum_1.HttpMethods.POST, createTemplateDto);
+    }
+    async updateTemplate(templateId, updateCodeTemplateDto) {
+        return await this.client.request(`/code-templates/${templateId}`, http_methods_enum_1.HttpMethods.PATCH, updateCodeTemplateDto);
     }
     async getTemplates(options) {
         const queryParams = new URLSearchParams(options);
@@ -32,21 +39,15 @@ class Promofire {
     async createBatchCode(createCodesDto) {
         return await this.client.request('/codes/batch', http_methods_enum_1.HttpMethods.POST, createCodesDto);
     }
-    async updateCode(updateCodeDto) {
-        return await this.client.request('/codes', http_methods_enum_1.HttpMethods.PATCH, updateCodeDto);
+    async updateCode(codeValue, updateCodeDto) {
+        return await this.client.request(`/codes/${codeValue}`, http_methods_enum_1.HttpMethods.PATCH, updateCodeDto);
     }
     async redeemCode(redeemCodeDto) {
         await this.client.request('/codes/redeem', http_methods_enum_1.HttpMethods.POST, redeemCodeDto);
     }
-    async getCodesByTemplate(templateId) {
-        return await this.client.request(`/codes/${templateId}`, http_methods_enum_1.HttpMethods.GET);
-    }
-    async filterCodes(filterDto) {
-        const queryParams = new URLSearchParams(filterDto).toString();
-        return await this.client.request(`/codes/filter?${queryParams}`, http_methods_enum_1.HttpMethods.GET);
-    }
     async createCustomer(createDto) {
-        return await this.client.request('/customers', http_methods_enum_1.HttpMethods.PUT, createDto);
+        const customer = await this.client.request('/customers', http_methods_enum_1.HttpMethods.PUT, createDto);
+        return customer;
     }
     async getMyRedeemedCodes(dataRange) {
         const queryParams = new URLSearchParams(dataRange);
@@ -54,14 +55,20 @@ class Promofire {
     }
     async getCodeRedeemesOwnedByMe(dataRange) {
         const queryParams = new URLSearchParams(dataRange);
-        return await this.client.request(`/codes/me/redeems?${queryParams}`, http_methods_enum_1.HttpMethods.GET);
+        return await this.client.request(`/code-redeems/me?${queryParams}`, http_methods_enum_1.HttpMethods.GET);
     }
     async getCodeRedeemesRedeemedByCustomer(customerId, dataRange) {
         const queryParams = new URLSearchParams(dataRange);
-        return await this.client.request(`/codes-redeems/redeemed-by/${customerId}?${queryParams}`, http_methods_enum_1.HttpMethods.GET);
+        return await this.client.request(`/code-redeems/redeemed-by/${customerId}?${queryParams}`, http_methods_enum_1.HttpMethods.GET);
+    }
+    async identifyCustomerByEmail(clientDataDto) {
+        return await this.client.request('/auth/sign-in/invite/email', http_methods_enum_1.HttpMethods.POST, clientDataDto);
+    }
+    async identifyCustomerByGoogle(clientDataDto) {
+        return await this.client.request('/auth/sign-in/invite/google', http_methods_enum_1.HttpMethods.POST, clientDataDto);
     }
     async deleteMe() {
-        await this.client.request(`/customers`, http_methods_enum_1.HttpMethods.DELETE);
+        await this.client.request('/customers', http_methods_enum_1.HttpMethods.DELETE);
     }
 }
 exports.Promofire = Promofire;
