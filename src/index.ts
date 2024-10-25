@@ -28,7 +28,6 @@ export class Promofire {
 
   async identify(): Promise<Promofire> {
     this.client = await this.client.authenticate();
-    console.log('Client: ', this.client);
     return this;
   }
 
