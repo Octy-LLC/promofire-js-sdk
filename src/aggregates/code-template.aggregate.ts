@@ -4,9 +4,7 @@ import { ICodePayload } from '../contracts/code/code-payload.contract';
 
 export class CodeTemplate {
   id: UUID;
-
   name: string;
-  // creator: { id: UUID };
   creatorId: UUID;
   createdAt: string;
   hasMutablePayload: boolean;

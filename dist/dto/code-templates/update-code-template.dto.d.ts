@@ -7,5 +7,5 @@ export declare class UpdateCodeTemplateDto {
     hasMutablePayload: boolean;
     isUsableByCustomers: boolean;
     description: string;
-    status: CodeTemplateStatuses;
+    status?: CodeTemplateStatuses;
 }

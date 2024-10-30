@@ -1,10 +1,11 @@
 import { IClientState } from './contracts/client/client-state.contract';
 import { HttpMethods } from './contracts/enums/http-methods.enum';
+import { CreateCustomerDto } from './dto/customers/create-customer.dto';
 export declare class Client implements IClientState {
     tenant: string;
     secret: string;
     constructor(tenant: string, secret: string);
-    authenticate(): Promise<AuthenticatedClient>;
+    authenticate(createCustomerDto: CreateCustomerDto): Promise<AuthenticatedClient>;
     request(): Promise<never>;
 }
 export declare class AuthenticatedClient implements IClientState {

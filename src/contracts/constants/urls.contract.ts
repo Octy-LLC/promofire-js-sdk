@@ -1,2 +1,2 @@
-// export const BASE_URL = 'http://67.207.74.174';
-export const BASE_URL = 'http://localhost:8080';
+export const BASE_URL = 'https://api.promofire.io';
+// export const BASE_URL = 'http://localhost:8080';

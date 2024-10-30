@@ -4,6 +4,7 @@ exports.CodeStatuses = void 0;
 var CodeStatuses;
 (function (CodeStatuses) {
     CodeStatuses["ACTIVE"] = "ACTIVE";
+    CodeStatuses["FULLY_REDEEMED"] = "FULLY_REDEEMED";
     CodeStatuses["DEACTIVATED"] = "DEACTIVATED";
 })(CodeStatuses || (exports.CodeStatuses = CodeStatuses = {}));
 //# sourceMappingURL=code-statuses.enum.js.map

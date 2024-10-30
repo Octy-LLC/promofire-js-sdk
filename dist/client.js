@@ -10,9 +10,10 @@ class Client {
         this.tenant = tenant;
         this.secret = secret;
     }
-    async authenticate() {
+    async authenticate(createCustomerDto) {
         const url = new URL('/auth/sdk', urls_contract_1.BASE_URL);
         const presetUrl = new URL('/customers/preset', urls_contract_1.BASE_URL);
+        const createCustomerUrl = new URL('/customers', urls_contract_1.BASE_URL);
         const { accessToken } = await fetch(url, {
             method: http_methods_enum_1.HttpMethods.POST,
             headers: {
@@ -30,7 +31,28 @@ class Client {
             body: JSON.stringify({ platform: 'WEB' }),
         })
             .then(async (response) => await response.json());
-        const client = new AuthenticatedClient(this.tenant, this.secret, data.accessToken);
+        const response = await fetch(createCustomerUrl, {
+            method: http_methods_enum_1.HttpMethods.PUT,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${data.accessToken}`,
+            },
+            body: JSON.stringify({
+                tenantAssignedId: createCustomerDto.tenantAssignedId,
+                platform: createCustomerDto.platform,
+                device: createCustomerDto.device,
+                os: createCustomerDto.os,
+                appBuild: createCustomerDto.appBuild,
+                appVersion: createCustomerDto.appVersion,
+                sdkVersion: createCustomerDto.sdkVersion,
+                firstName: createCustomerDto.firstName,
+                lastName: createCustomerDto.lastName,
+                email: createCustomerDto.email,
+                phone: createCustomerDto.phone,
+            }),
+        })
+            .then(async (res) => await res.json());
+        const client = new AuthenticatedClient(this.tenant, this.secret, response.accessToken);
         return client;
     }
     ;
@@ -58,6 +80,7 @@ class AuthenticatedClient {
             method,
             body: body ? JSON.stringify(body) : undefined,
         });
+        console.log(response.status);
         if (response.status === 204) {
             return undefined;
         }

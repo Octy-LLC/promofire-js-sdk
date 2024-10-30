@@ -3,6 +3,7 @@ import { BASE_URL } from './contracts/constants/urls.contract';
 import { HttpMethods } from './contracts/enums/http-methods.enum';
 import { AlreadyAuthenticated } from './contracts/errors/already-authenticated.error';
 import { Unauthenticated } from './contracts/errors/unauthenticated.error';
+import { CreateCustomerDto } from './dto/customers/create-customer.dto';
 
 export class Client implements IClientState {
   tenant: string;
@@ -17,9 +18,10 @@ export class Client implements IClientState {
    * @param userId
    * tenant assigned user id
    */
-  async authenticate(): Promise<AuthenticatedClient> {
+  async authenticate(createCustomerDto: CreateCustomerDto): Promise<AuthenticatedClient> {
     const url = new URL('/auth/sdk', BASE_URL);
     const presetUrl = new URL('/customers/preset', BASE_URL);
+    const createCustomerUrl = new URL('/customers', BASE_URL);
 
     const { accessToken } = await fetch(url, {
       method: HttpMethods.POST,
@@ -40,7 +42,29 @@ export class Client implements IClientState {
     })
       .then(async response => await response.json());
 
-    const client = new AuthenticatedClient(this.tenant, this.secret, data.accessToken);
+    const response = await fetch(createCustomerUrl, {
+      method: HttpMethods.PUT,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${data.accessToken}`,
+      },
+      body: JSON.stringify({
+        tenantAssignedId: createCustomerDto.tenantAssignedId,
+        platform: createCustomerDto.platform,
+        device: createCustomerDto.device,
+        os: createCustomerDto.os,
+        appBuild: createCustomerDto.appBuild,
+        appVersion: createCustomerDto.appVersion,
+        sdkVersion: createCustomerDto.sdkVersion,
+        firstName: createCustomerDto.firstName,
+        lastName: createCustomerDto.lastName,
+        email: createCustomerDto.email,
+        phone: createCustomerDto.phone,
+      }),
+    })
+      .then(async res => await res.json());
+
+    const client = new AuthenticatedClient(this.tenant, this.secret, response.accessToken);
 
     return client;
   };
@@ -76,6 +100,8 @@ export class AuthenticatedClient implements IClientState {
       method,
       body: body ? JSON.stringify(body) : undefined,
     });
+
+    console.log(response.status)
   
     if (response.status === 204) {
       return undefined as unknown as T;
