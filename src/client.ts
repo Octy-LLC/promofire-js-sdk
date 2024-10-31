@@ -3,6 +3,7 @@ import { BASE_URL } from './contracts/constants/urls.contract';
 import { HttpMethods } from './contracts/enums/http-methods.enum';
 import { AlreadyAuthenticated } from './contracts/errors/already-authenticated.error';
 import { Unauthenticated } from './contracts/errors/unauthenticated.error';
+import { CreateCustomerDto } from './dto/customers/create-customer.dto';
 
 export class Client implements IClientState {
   tenant: string;
@@ -17,16 +18,53 @@ export class Client implements IClientState {
    * @param userId
    * tenant assigned user id
    */
-  async authenticate(userId: string): Promise<AuthenticatedClient> {
-    const url = new URL('/api/auth/sign-in/sdk', BASE_URL);
+  async authenticate(createCustomerDto: CreateCustomerDto): Promise<AuthenticatedClient> {
+    const url = new URL('/auth/sdk', BASE_URL);
+    const presetUrl = new URL('/customers/preset', BASE_URL);
+    const createCustomerUrl = new URL('/customers', BASE_URL);
 
     const { accessToken } = await fetch(url, {
       method: HttpMethods.POST,
-      body: JSON.stringify({ tenant: this.tenant, secret: this.secret, sub: userId }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ tenant: this.tenant, secret: this.secret }),
     })
       .then(async response => await response.json());
 
-    const client = new AuthenticatedClient(this.tenant, this.secret, accessToken);
+    const data = await fetch(presetUrl, {
+      method: HttpMethods.POST,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ platform: 'WEB' }),
+    })
+      .then(async response => await response.json());
+
+    const response = await fetch(createCustomerUrl, {
+      method: HttpMethods.PUT,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${data.accessToken}`,
+      },
+      body: JSON.stringify({
+        tenantAssignedId: createCustomerDto.tenantAssignedId,
+        platform: createCustomerDto.platform,
+        device: createCustomerDto.device,
+        os: createCustomerDto.os,
+        appBuild: createCustomerDto.appBuild,
+        appVersion: createCustomerDto.appVersion,
+        sdkVersion: createCustomerDto.sdkVersion,
+        firstName: createCustomerDto.firstName,
+        lastName: createCustomerDto.lastName,
+        email: createCustomerDto.email,
+        phone: createCustomerDto.phone,
+      }),
+    })
+      .then(async res => await res.json());
+
+    const client = new AuthenticatedClient(this.tenant, this.secret, response.accessToken);
 
     return client;
   };
@@ -51,16 +89,25 @@ export class AuthenticatedClient implements IClientState {
     throw new AlreadyAuthenticated;
   }
 
-  request<T = any>(path: string, method: HttpMethods, body?: any): Promise<T> {
+  async request<T = any>(path: string, method: HttpMethods, body?: any): Promise<T> {
     const url = new URL(path, BASE_URL);
-
-    const request = fetch(url, {
-      headers: { 'Authorization': `Bearer ${this.token}` },
+  
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${this.token}`,
+        'Content-Type': 'application/json',
+      },
       method,
-      body: JSON.stringify(body),
-    })
-      .then(async response => await response.json()) as Promise<T>;
+      body: body ? JSON.stringify(body) : undefined,
+    });
 
-    return request;
+    console.log(response.status)
+  
+    if (response.status === 204) {
+      return undefined as unknown as T;
+    }
+  
+    const responseData = await response.json();
+    return responseData;
   }
 }

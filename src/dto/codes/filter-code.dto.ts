@@ -11,7 +11,13 @@ export class FilterCodeDto implements IPaginable {
   templateId?: UUID;
   ownerId?: UUID;
   ownerType?: UserTypes;
+  sortBy?: SortingCriteria;
+  sortOrder?: 'asc' | 'desc';
 
   limit: number;
   offset: number;
+  from: string;
+  to: string;
 }
+
+type SortingCriteria = "value" | "status" | "redeems" | "newCustomers" | "expiresAt"

@@ -4,12 +4,17 @@ import { CodeStatuses } from '../contracts/code/code-statuses.enum';
 
 export class Code {
   value: string;
-  template: UUID;
+  templateId: UUID;
   amount: number;
   status: CodeStatuses;
-  owner: UUID;
+  ownerId: UUID;
   expiresAt: number;
   createdAt: string;
   updatedAt: string;
   payload: Record<string, string>;
+}
+
+export class CodesDto {
+  total: number;
+  codes: Code[];
 }

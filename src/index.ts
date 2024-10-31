@@ -1,19 +1,20 @@
-import { CodeTemplate } from './aggregates/code-template.aggregate';
+import { CodeTemplate, CodeTemplatesDto } from './aggregates/code-template.aggregate';
 import { Client } from './client';
 import { IAuthTokens } from './contracts/auth/auth-tokens.contract';
 import { IClientState } from './contracts/client/client-state.contract';
 import { HttpMethods } from './contracts/enums/http-methods.enum';
 import { UUID } from './contracts/utils/uuid.contract';
+import { CreateCodeTemplateDto } from './dto/code-templates/create-code-template.dto';
+import { UpdateCodeTemplateDto } from './dto/code-templates/update-code-template.dto';
 import { CreateCodeDto } from './dto/codes/create-code.dto';
 import { CreateCodesDto } from './dto/codes/create-codes.dto';
-import { FilterCodeDto } from './dto/codes/filter-code.dto';
 import { RedeemCodeDto } from './dto/codes/redeem-code.dto';
 import { UpdateCodeDto } from './dto/codes/update-code.dto';
 import { CreateCustomerDto } from './dto/customers/create-customer.dto';
-import { DateRange } from './dto/util/date-range.dto';
+import { GetMyRedeemedCodesDto } from './dto/util/get-my-redeemed-codes.dto';
 import { SearchCodeTemplatesDto } from './dto/util/search-code-templates.dto';
 import { CodeRedeem } from './entities/code-redeem.entity';
-import { Code } from './entities/code.entity';
+import { Code, CodesDto } from './entities/code.entity';
 
 export { Client };
 
@@ -24,74 +25,91 @@ export class Promofire {
     this.client = new Client(tenant, secret);
   }
 
-  async identify(userId: string): Promise<Promofire> {
-    this.client = await this.client.authenticate(userId);
+  async identify(createCustomerDto: CreateCustomerDto): Promise<Promofire> {
+    this.client = await this.client.authenticate(createCustomerDto);
+    console.log('Client: ', this.client);
     return this;
   }
 
-  async getTemplates(options: SearchCodeTemplatesDto): Promise<CodeTemplate[]> {
-    const queryParams = new URLSearchParams(options as any as Record<string, string>);
-    return await this.client.request<CodeTemplate[]>(`/api/code-templates?${queryParams}`, HttpMethods.GET);
+  async createTemplate(createTemplateDto: CreateCodeTemplateDto): Promise<CodeTemplate> {
+    return await this.client.request<CodeTemplate>('/code-templates', HttpMethods.POST, createTemplateDto);
   }
 
-  async getTemplateById(templateId: UUID): Promise<CodeTemplate | null> {
-    return await this.client.request<CodeTemplate | null>(`/api/code-templates/${templateId}`, HttpMethods.GET);
+  async updateTemplate(templateId: UUID, updateCodeTemplateDto: UpdateCodeTemplateDto): Promise<CodeTemplate> {
+    return await this.client.request<CodeTemplate>(`/code-templates/${templateId}`, HttpMethods.PATCH, updateCodeTemplateDto);
   }
 
-  async getCodes(options: FilterCodeDto): Promise<Code[] | null> {
+  async getCampaigns(options: SearchCodeTemplatesDto): Promise<CodeTemplatesDto> {
     const queryParams = new URLSearchParams(options as any as Record<string, string>);
-    return await this.client.request<Code[] | null>(`/api/codes?${queryParams}`, HttpMethods.GET);
+    return await this.client.request<CodeTemplatesDto>(`/code-templates?${queryParams}`, HttpMethods.GET);
+  }
+
+  async getCampaignById(templateId: UUID): Promise<CodeTemplate | null> {
+    return await this.client.request<CodeTemplate | null>(`/code-templates/${templateId}`, HttpMethods.GET);
+  }
+
+  async getCurrentUserCodes(options: { limit: number, offset: number }): Promise<CodesDto | null> {
+    const queryParams = new URLSearchParams(options as any as Record<string, string>);
+    return await this.client.request<CodesDto | null>(`/codes/me?${queryParams}`, HttpMethods.GET);
   }
 
   async getCodeByValue(codeValue: string): Promise<Code | null> {
-    return await this.client.request<Code | null>(`/api/codes/${codeValue}`, HttpMethods.GET);
+    return await this.client.request<Code | null>(`/codes/${codeValue}`, HttpMethods.GET);
   }
 
-  async createCode(createCodeDto: CreateCodeDto): Promise<Code> {
-    return await this.client.request<Code>('/api/codes', HttpMethods.POST, createCodeDto);
+  async generateCode(createCodeDto: CreateCodeDto): Promise<Code> {
+    return await this.client.request<Code>('/codes', HttpMethods.POST, createCodeDto);
   }
 
-  async createBatchCode(createCodesDto: CreateCodesDto): Promise<Code[]> {
-    return await this.client.request<Code[]>('/api/codes/batch', HttpMethods.POST, createCodesDto);
+  async generateBatchCode(createCodesDto: CreateCodesDto): Promise<Code[]> {
+    return await this.client.request<Code[]>('/codes/batch', HttpMethods.POST, createCodesDto);
   }
 
-  async updateCode(updateCodeDto: UpdateCodeDto): Promise<Code> {
-    return await this.client.request<Code>('/api/codes', HttpMethods.PATCH, updateCodeDto);
+  async updateCode(codeValue: string, updateCodeDto: UpdateCodeDto): Promise<Code> {
+    return await this.client.request<Code>(`/codes/${codeValue}`, HttpMethods.PATCH, updateCodeDto);
   }
 
   async redeemCode(redeemCodeDto: RedeemCodeDto): Promise<void> {
-    await this.client.request<void>('/api/codes/redeem', HttpMethods.POST, redeemCodeDto);
-  }
-
-  async getCodesByTemplate(templateId: string): Promise<Code[]> {
-    return await this.client.request<Code[]>(`/api/codes/${templateId}`, HttpMethods.GET);
-  }
-
-  async filterCodes(filterDto: FilterCodeDto): Promise<Code[]> {
-    const queryParams = new URLSearchParams(filterDto as unknown as Record<string, string>).toString();
-    return await this.client.request<Code[]>(`/api/codes/filter?${queryParams}`, HttpMethods.GET);
+    await this.client.request<void>('/codes/redeem', HttpMethods.POST, redeemCodeDto);
   }
 
   async createCustomer(createDto: CreateCustomerDto): Promise<IAuthTokens> {
-    return await this.client.request<IAuthTokens>('/api/customers', HttpMethods.PUT, createDto);
+    const customer = await this.client.request<IAuthTokens>('/customers', HttpMethods.PUT, createDto);
+    return customer;
   }
 
-  async getMyRedeemedCodes(dataRange: DateRange): Promise<CodeRedeem[]> {
-    const queryParams = new URLSearchParams(dataRange as any as Record<string, string>);
-    return await this.client.request<CodeRedeem[]>(`/api/code-redeems?${queryParams}`, HttpMethods.GET);
+  async getCodeRedeems(getMyRedeemedCodesDto: GetMyRedeemedCodesDto): Promise<CodeRedeem[]> {
+    const queryParams = new URLSearchParams(getMyRedeemedCodesDto as any as Record<string, string>);
+    return await this.client.request<CodeRedeem[]>(`/codes/redeems?${queryParams}`, HttpMethods.GET);
   }
 
-  async getCodeRedeemesOwnedByMe(dataRange: DateRange): Promise<CodeRedeem[]> {
-    const queryParams = new URLSearchParams(dataRange as any as Record<string, string>);
-    return await this.client.request<CodeRedeem[]>(`/api/codes/me/redeems?${queryParams}`, HttpMethods.GET);
+  async getCurrentUserRedeems(getMyRedeemedCodesDto: GetMyRedeemedCodesDto): Promise<CodeRedeem[]> {
+    const queryParams = new URLSearchParams(getMyRedeemedCodesDto as any as Record<string, string>);
+    return await this.client.request<CodeRedeem[]>(`/codes/redeems/me?${queryParams}`, HttpMethods.GET);
   }
 
-  async getCodeRedeemesRedeemedByCustomer(customerId: UUID, dataRange: DateRange): Promise<CodeRedeem[]> {
-    const queryParams = new URLSearchParams(dataRange as any as Record<string, string>);
-    return await this.client.request<CodeRedeem[]>(`/api/codes-redeems/redeemed-by/${customerId}?${queryParams}`, HttpMethods.GET);
+  async identifyCustomerByEmail(clientDataDto: { email: string, firstName: string, lastName: string, inviteToken: string }) {
+    return await this.client.request('/auth/sign-in/invite/email', HttpMethods.POST, clientDataDto);
+  }
+
+  async identifyCustomerByGoogle(clientDataDto: { code: string, inviteToken: string }) {
+    return await this.client.request('/auth/sign-in/invite/google', HttpMethods.POST, clientDataDto);
+  }
+
+  async getCurrentUser(): Promise<any> {
+    return await this.client.request('/customers/me', HttpMethods.GET);
+  }
+
+  async updateCurrentUser(updateMeDto: {
+    firstName?: string,
+    lastName?: string,
+    email?: string,
+    phone?: string
+  }): Promise<any> {
+    return await this.client.request('/customers/me', HttpMethods.PATCH, updateMeDto);
   }
 
   async deleteMe(): Promise<void> {
-    await this.client.request<void>(`/api/customers`, HttpMethods.DELETE);
+    await this.client.request<void>('/customers/me', HttpMethods.DELETE);
   }
 }
