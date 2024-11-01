@@ -10,7 +10,6 @@ class Promofire {
     }
     async identify(createCustomerDto) {
         this.client = await this.client.authenticate(createCustomerDto);
-        console.log('Client: ', this.client);
         return this;
     }
     async createTemplate(createTemplateDto) {

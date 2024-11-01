@@ -1,6 +1,6 @@
 {
-  "name": "@octy/promofire-js-sdk",
-  "version": "0.2.0",
+  "name": "promofire-js-sdk",
+  "version": "0.2.1",
   "description": "promofire javascript sdk",
   "main": "dist/index.js",
   "scripts": {
@@ -8,6 +8,9 @@
   },
   "keywords": ["promofire", "sdk"],
   "license": "ISC",
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "typescript": "^5.4.2"
   }

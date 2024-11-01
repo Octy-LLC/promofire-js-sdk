@@ -6,8 +6,22 @@ npm install @octy/promofire-js-sdk
 ``` js
 import { Promofire } from '@octy/promofire-js-sdk';
 
+const customerData = {
+  platform: 'YOUR_PLATFORM',
+  device: 'YOUR_DEVICE',
+  os: 'OS',
+  appBuild: 'APP_BUILD',
+  appVersion: 'APP_VERSION',
+  sdkVersion: 'SDK_VERSION'
+  tenantAssignedId: 'TENANT_ASSIGNED_ID', // optional parameter
+  firstName: 'FIRST_NAME', // optional parameter
+  lastName: 'LAST_NAME', // optional parameter
+  email: 'YOUR_EMAIL', // optional parameter
+  phone: 'YOUR_PHONE' // optional parameter
+}
+
 const promofire = new Promofire('YOUR_TENANT', 'YOUR_SECRET')
-  .identify('YOUR_CUSTOMER_ID_IN_YOUR_DB');
+const sdk = promofire.identify(customerData);
 ```
 # Methods
 
@@ -23,11 +37,9 @@ const promofire = new Promofire('YOUR_TENANT', 'YOUR_SECRET')
 - update code
 - redeem code
 - get codes by template id
-- filter codes
 - get my redeemed codes
 - get code redeemes owned by me
 - get code redeemes redeemed by customer
 
-- create customer (assign customer data)
 - identify customer (upsert customer preset)
 - delete customer
