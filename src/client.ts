@@ -100,8 +100,6 @@ export class AuthenticatedClient implements IClientState {
       method,
       body: body ? JSON.stringify(body) : undefined,
     });
-
-    console.log(response.status)
   
     if (response.status === 204) {
       return undefined as unknown as T;
