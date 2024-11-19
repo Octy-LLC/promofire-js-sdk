@@ -1,10 +1,10 @@
 # Installation
 ``` bash
-npm install @octy/promofire-js-sdk
+npm install promofire-js-sdk
 ```
 # Setup
 ``` js
-import { Promofire } from '@octy/promofire-js-sdk';
+import { Promofire } from 'promofire-js-sdk';
 
 const customerData = {
   platform: 'YOUR_PLATFORM',
@@ -12,7 +12,7 @@ const customerData = {
   os: 'OS',
   appBuild: 'APP_BUILD',
   appVersion: 'APP_VERSION',
-  sdkVersion: 'SDK_VERSION'
+  sdkVersion: 'SDK_VERSION',
   tenantAssignedId: 'TENANT_ASSIGNED_ID', // optional parameter
   firstName: 'FIRST_NAME', // optional parameter
   lastName: 'LAST_NAME', // optional parameter
