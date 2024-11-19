@@ -80,6 +80,7 @@ class AuthenticatedClient {
             method,
             body: body ? JSON.stringify(body) : undefined,
         });
+        console.log(response.status);
         if (response.status === 204) {
             return undefined;
         }
