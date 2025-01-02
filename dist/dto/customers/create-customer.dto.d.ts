@@ -6,7 +6,7 @@ export declare class CreateCustomerDto {
     appBuild: string;
     appVersion: string;
     sdkVersion: string;
-    tenantAssignedId?: string;
+    customerUserId?: string;
     firstName?: string;
     lastName?: string;
     email?: string;

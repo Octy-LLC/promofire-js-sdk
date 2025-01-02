@@ -27,6 +27,7 @@ export class Promofire {
 
   async identify(createCustomerDto: CreateCustomerDto): Promise<Promofire> {
     this.client = await this.client.authenticate(createCustomerDto);
+    console.log('Client: ', this.client);
     return this;
   }
 
