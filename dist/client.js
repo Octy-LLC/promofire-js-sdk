@@ -19,7 +19,7 @@ class Client {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ tenant: this.tenant, secret: this.secret }),
+            body: JSON.stringify({ secret: this.secret }),
         })
             .then(async (response) => await response.json());
         const data = await fetch(presetUrl, {
@@ -38,7 +38,7 @@ class Client {
                 'Authorization': `Bearer ${data.accessToken}`,
             },
             body: JSON.stringify({
-                tenantAssignedId: createCustomerDto.tenantAssignedId,
+                customerUserId: createCustomerDto.customerUserId,
                 platform: createCustomerDto.platform,
                 device: createCustomerDto.device,
                 os: createCustomerDto.os,
@@ -80,7 +80,6 @@ class AuthenticatedClient {
             method,
             body: body ? JSON.stringify(body) : undefined,
         });
-        console.log(response.status);
         if (response.status === 204) {
             return undefined;
         }

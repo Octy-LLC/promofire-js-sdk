@@ -1,2 +1,1 @@
-export declare const BASE_URL = "https://api.promofire.io";
-// export declare const BASE_URL = 'http://localhost:8080';
+export declare const BASE_URL = "https://api.stage.promofire.io";
