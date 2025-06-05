@@ -6,6 +6,12 @@ npm install promofire-js-sdk
 ``` js
 import { Promofire } from 'promofire-js-sdk';
 
+const sdkData = {
+  secret: 'YOUR_SECRET',
+  appBuild: 'YOUR_APP_BUILD', // optional
+  appVersion: 'YOUR_APP_VERSION', // optional
+}
+
 const customerData = {
   platform: 'YOUR_PLATFORM',
   device: 'YOUR_DEVICE',
@@ -13,16 +19,46 @@ const customerData = {
   appBuild: 'APP_BUILD',
   appVersion: 'APP_VERSION',
   sdkVersion: 'SDK_VERSION',
-  tenantAssignedId: 'TENANT_ASSIGNED_ID', // optional parameter
-  firstName: 'FIRST_NAME', // optional parameter
-  lastName: 'LAST_NAME', // optional parameter
-  email: 'YOUR_EMAIL', // optional parameter
-  phone: 'YOUR_PHONE' // optional parameter
+  tenantAssignedId: 'TENANT_ASSIGNED_ID', // optional
+  firstName: 'FIRST_NAME', // optional
+  lastName: 'LAST_NAME', // optional
+  email: 'YOUR_EMAIL', // optional
+  phone: 'YOUR_PHONE' // optional
 }
 
-const promofire = new Promofire('YOUR_TENANT', 'YOUR_SECRET')
-const sdk = promofire.identify(customerData);
+const promofire = new Promofire(sdkData)
+  .identify({
+    /** optional, if not provided system would create on it's own */
+    customerUserId: 'YOUR_USER_ID',
+    firstName: 'FIRST_NAME', //optional
+    lastName: 'LAST_NAME', //optional
+    email: 'EMAIL', //optional
+    phone: 'PHONE', //optional
+  })
 ```
+
+# Userless App Setup
+``` js
+import { Promofire } from 'promofire-js-sdk';
+
+const sdkData = {
+  secret: 'YOUR_SECRET',
+  appBuild: 'YOUR_APP_BUILD', // optional
+  appVersion: 'YOUR_APP_VERSION', // optional
+}
+
+const customerData = {
+  tenantAssignedId: 'TENANT_ASSIGNED_ID', // optional
+  firstName: 'FIRST_NAME', // optional
+  lastName: 'LAST_NAME', // optional
+  email: 'YOUR_EMAIL', // optional
+  phone: 'YOUR_PHONE' // optional
+}
+
+const promofire = new Promofire(sdkData)
+  .anonify();
+```
+
 # Methods
 
 - create template

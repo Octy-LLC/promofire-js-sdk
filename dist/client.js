@@ -1,20 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthenticatedClient = exports.Client = void 0;
+exports.AuthenticatedClient = exports.AuthenticatingClient = exports.Client = exports.ClientState = void 0;
 const urls_contract_1 = require("./contracts/constants/urls.contract");
 const http_methods_enum_1 = require("./contracts/enums/http-methods.enum");
 const already_authenticated_error_1 = require("./contracts/errors/already-authenticated.error");
 const unauthenticated_error_1 = require("./contracts/errors/unauthenticated.error");
-class Client {
-    constructor(tenant, secret) {
-        this.tenant = tenant;
-        this.secret = secret;
+const utils_1 = require("./utils");
+class ClientState {
+    constructor(options) {
+        this.os = (0, utils_1.getOS)();
+        this.secret = options.secret;
+        this.appBuild = options.appBuild || 'unknown';
+        this.appVersion = options.appVersion || 'unknown';
     }
-    async authenticate(createCustomerDto) {
-        const url = new URL('/auth/sdk', urls_contract_1.BASE_URL);
+}
+exports.ClientState = ClientState;
+class Client extends ClientState {
+    async authenticate(options) {
+        const sdkAuthUrl = new URL('/auth/sdk', urls_contract_1.BASE_URL);
         const presetUrl = new URL('/customers/preset', urls_contract_1.BASE_URL);
         const createCustomerUrl = new URL('/customers', urls_contract_1.BASE_URL);
-        const { accessToken } = await fetch(url, {
+        const sdkAuth = await fetch(sdkAuthUrl, {
             method: http_methods_enum_1.HttpMethods.POST,
             headers: {
                 'Content-Type': 'application/json'
@@ -22,38 +28,40 @@ class Client {
             body: JSON.stringify({ secret: this.secret }),
         })
             .then(async (response) => await response.json());
-        const data = await fetch(presetUrl, {
+        const preset = await fetch(presetUrl, {
             method: http_methods_enum_1.HttpMethods.POST,
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken}`,
+                'Authorization': `Bearer ${sdkAuth.accessToken}`,
             },
             body: JSON.stringify({ platform: 'WEB' }),
         })
             .then(async (response) => await response.json());
-        const response = await fetch(createCustomerUrl, {
-            method: http_methods_enum_1.HttpMethods.PUT,
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${data.accessToken}`,
-            },
-            body: JSON.stringify({
-                customerUserId: createCustomerDto.customerUserId,
-                platform: createCustomerDto.platform,
-                device: createCustomerDto.device,
-                os: createCustomerDto.os,
-                appBuild: createCustomerDto.appBuild,
-                appVersion: createCustomerDto.appVersion,
-                sdkVersion: createCustomerDto.sdkVersion,
-                firstName: createCustomerDto.firstName,
-                lastName: createCustomerDto.lastName,
-                email: createCustomerDto.email,
-                phone: createCustomerDto.phone,
-            }),
-        })
-            .then(async (res) => await res.json());
-        const client = new AuthenticatedClient(this.tenant, this.secret, response.accessToken);
-        return client;
+        if (options.customerUserId) {
+            const response = await fetch(createCustomerUrl, {
+                method: http_methods_enum_1.HttpMethods.PUT,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${preset.accessToken}`,
+                },
+                body: JSON.stringify({
+                    customerUserId: options.customerUserId,
+                    platform: 'WEB',
+                    device: this.device,
+                    os: this.os,
+                    appBuild: this.appBuild,
+                    appVersion: this.appVersion,
+                    sdkVersion: this.sdkVersion,
+                    firstName: options.firstName,
+                    lastName: options.lastName,
+                    email: options.email,
+                    phone: options.phone,
+                }),
+            })
+                .then(async (res) => await res.json());
+            return new AuthenticatedClient({ ...this, token: response.accessToken });
+        }
+        return new AuthenticatedClient({ ...this, token: preset.accessToken });
     }
     ;
     async request() {
@@ -61,11 +69,25 @@ class Client {
     }
 }
 exports.Client = Client;
-class AuthenticatedClient {
-    constructor(tenant, secret, token) {
-        this.tenant = tenant;
-        this.secret = secret;
-        this.token = token;
+class AuthenticatingClient extends ClientState {
+    constructor() {
+        super(...arguments);
+        this.requests = [];
+    }
+    async authenticate() {
+        throw new already_authenticated_error_1.AlreadyAuthenticated;
+    }
+    async request(url, method, body) {
+        return new Promise((resolve, reject) => {
+            this.requests.push({ url, method, body, resolve, reject });
+        });
+    }
+}
+exports.AuthenticatingClient = AuthenticatingClient;
+class AuthenticatedClient extends ClientState {
+    constructor(options) {
+        super(options);
+        this.token = options.token;
     }
     async authenticate() {
         throw new already_authenticated_error_1.AlreadyAuthenticated;
@@ -80,10 +102,13 @@ class AuthenticatedClient {
             method,
             body: body ? JSON.stringify(body) : undefined,
         });
-        if (response.status === 204) {
-            return undefined;
-        }
-        const responseData = await response.json();
+        const responseData = await response.json()
+            .catch(err => {
+            if (err.message.startsWith('Unexpected token'))
+                return undefined;
+            else
+                throw err;
+        });
         return responseData;
     }
 }

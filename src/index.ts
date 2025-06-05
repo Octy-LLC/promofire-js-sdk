@@ -1,7 +1,6 @@
 import { CodeTemplate, CodeTemplatesDto } from './aggregates/code-template.aggregate';
-import { Client } from './client';
+import { AuthenticatedClient, AuthenticatingClient, Client, ClientState } from './client';
 import { IAuthTokens } from './contracts/auth/auth-tokens.contract';
-import { IClientState } from './contracts/client/client-state.contract';
 import { HttpMethods } from './contracts/enums/http-methods.enum';
 import { UUID } from './contracts/utils/uuid.contract';
 import { CreateCodeTemplateDto } from './dto/code-templates/create-code-template.dto';
@@ -15,19 +14,59 @@ import { GetMyRedeemedCodesDto } from './dto/util/get-my-redeemed-codes.dto';
 import { SearchCodeTemplatesDto } from './dto/util/search-code-templates.dto';
 import { CodeRedeem } from './entities/code-redeem.entity';
 import { Code, CodesDto } from './entities/code.entity';
+import { IConstructPromofire } from './contracts/promofire/construct-promofire.contract';
+import { IAuthenticateClient } from './contracts/client/authenticate-client.contract';
 
 export { Client };
 
 export class Promofire {
-  private client: IClientState;
+  private client: ClientState;
 
-  constructor(tenant: string, secret: string) {
-    this.client = new Client(tenant, secret);
+  constructor(options: IConstructPromofire) {
+    const { secret } = options;
+    const appBuild = options.appBuild || 'unknown';
+    const appVersion = options.appVersion || 'unknown';
+
+    this.client = new Client({ secret, appBuild, appVersion });
   }
 
-  async identify(createCustomerDto: CreateCustomerDto): Promise<Promofire> {
-    this.client = await this.client.authenticate(createCustomerDto);
-    console.log('Client: ', this.client);
+  /**
+   * Would create anonymous user.
+   */
+  anonify(): Promofire {
+    this.client.authenticate({})
+      .then((client: AuthenticatedClient) => {
+        const requests = (this.client as AuthenticatingClient).requests;
+        this.client = client;
+
+        requests.forEach(req => {
+          client.request(req.url, req.method, req.body)
+            .then(req.resolve, req.reject);
+        });
+      });
+
+    this.client = new AuthenticatingClient(this.client as any);
+
+    return this;
+  }
+
+  /**
+   * Inserts or updates existing customer in Promofire.
+   */
+  identify(options: IAuthenticateClient): Promofire {
+    this.client.authenticate({ ...options })
+      .then((client: AuthenticatedClient) => {
+        const requests = (this.client as AuthenticatingClient).requests;
+        this.client = client;
+
+        requests.forEach(req => {
+          client.request(req.url, req.method, req.body)
+            .then(req.resolve, req.reject);
+        });
+      });
+
+    this.client = new AuthenticatingClient(this.client as any);
+
     return this;
   }
 

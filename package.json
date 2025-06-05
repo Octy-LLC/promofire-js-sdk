@@ -1,12 +1,10 @@
 {
   "name": "promofire-js-sdk",
-  "version": "0.2.5",
+  "version": "0.3.0",
   "description": "promofire javascript sdk",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
-    "build:stage": "dotenv -e .env.stage tsc",
-    "build:prod": "dotenv -e .env.prod tsc"
+    "build": "tsc"
   },
   "keywords": [
     "promofire",
@@ -18,11 +16,6 @@
   },
   "devDependencies": {
     "@types/node": "22.10.3",
-    "cross-env": "7.0.3",
-    "dotenv-cli": "8.0.0",
     "typescript": "5.4.2"
-  },
-  "dependencies": {
-    "dotenv": "16.4.7"
   }
 }

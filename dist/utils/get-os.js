@@ -1,0 +1,119 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getOS = void 0;
+function getOS() {
+    const ua = window.navigator.userAgent;
+    if (/Windows NT/.test(ua))
+        return 'Windows';
+    else if (/Mac OS X/.test(ua))
+        return 'macOS';
+    else if (/Linux/.test(ua))
+        return 'Linux';
+    else if (/Android/.test(ua))
+        return 'Android';
+    else if (/iPhone|iPad|iPod/.test(ua))
+        return 'iOS';
+    else if (/CrOS/.test(ua))
+        return 'Chrome OS';
+    else if (/FreeBSD/.test(ua))
+        return 'FreeBSD';
+    else if (/OpenBSD/.test(ua))
+        return 'OpenBSD';
+    else if (/NetBSD/.test(ua))
+        return 'NetBSD';
+    else if (/SunOS/.test(ua))
+        return 'SunOS';
+    else if (/AIX/.test(ua))
+        return 'AIX';
+    else if (/HP-UX/.test(ua))
+        return 'HP-UX';
+    else if (/IRIX/.test(ua))
+        return 'IRIX';
+    else if (/BeOS/.test(ua))
+        return 'BeOS';
+    else if (/AmigaOS/.test(ua))
+        return 'AmigaOS';
+    else if (/MorphOS/.test(ua))
+        return 'MorphOS';
+    else if (/RISC OS/.test(ua))
+        return 'RISC OS';
+    else if (/Syllable/.test(ua))
+        return 'Syllable';
+    else if (/Plan 9/.test(ua))
+        return 'Plan 9';
+    else if (/Haiku/.test(ua))
+        return 'Haiku';
+    else if (/WebOS/.test(ua))
+        return 'WebOS';
+    else if (/Tizen/.test(ua))
+        return 'Tizen';
+    else if (/KaiOS/.test(ua))
+        return 'KaiOS';
+    else if (/QNX/.test(ua))
+        return 'QNX';
+    else if (/Symbian/.test(ua))
+        return 'Symbian';
+    else if (/BlackBerry/.test(ua))
+        return 'BlackBerry';
+    else if (/Bada/.test(ua))
+        return 'Bada';
+    else if (/tvOS/.test(ua))
+        return 'tvOS';
+    else if (/watchOS/.test(ua))
+        return 'watchOS';
+    else if (/Nintendo Switch/.test(ua))
+        return 'Nintendo Switch';
+    else if (/PlayStation/.test(ua))
+        return 'PlayStation';
+    else if (/Xbox/.test(ua))
+        return 'Xbox';
+    else if (/SteamOS/.test(ua))
+        return 'SteamOS';
+    else if (/Fuchsia/.test(ua))
+        return 'Fuchsia';
+    else if (/VxWorks/.test(ua))
+        return 'VxWorks';
+    else if (/SCO OpenServer/.test(ua))
+        return 'SCO OpenServer';
+    else if (/Solaris/.test(ua))
+        return 'Solaris';
+    else if (/DOS/.test(ua))
+        return 'DOS';
+    else if (/ReactOS/.test(ua))
+        return 'ReactOS';
+    else if (/Emacs/.test(ua))
+        return 'Emacs';
+    else if (/Plan 9/.test(ua))
+        return 'Plan 9';
+    else if (/Inferno/.test(ua))
+        return 'Inferno';
+    else if (/Redox/.test(ua))
+        return 'Redox';
+    else if (/NixOS/.test(ua))
+        return 'NixOS';
+    else if (/OpenVMS/.test(ua))
+        return 'OpenVMS';
+    else if (/AROS/.test(ua))
+        return 'AROS';
+    else if (/SkyOS/.test(ua))
+        return 'SkyOS';
+    else if (/Syllable/.test(ua))
+        return 'Syllable';
+    else if (/OpenBSD/.test(ua))
+        return 'OpenBSD';
+    else if (/NetBSD/.test(ua))
+        return 'NetBSD';
+    else if (/DragonFly BSD/.test(ua))
+        return 'DragonFly BSD';
+    else if (/Haiku/.test(ua))
+        return 'Haiku';
+    else if (/OpenIndiana/.test(ua))
+        return 'OpenIndiana';
+    else if (/Illumos/.test(ua))
+        return 'Illumos';
+    else if (/AIX/.test(ua))
+        return 'AIX';
+    return 'unknown';
+}
+exports.getOS = getOS;
+//# sourceMappingURL=get-os.js.map

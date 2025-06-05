@@ -7,6 +7,11 @@ export class CreateCustomerDto {
   appBuild: string;
   appVersion: string;
   sdkVersion: string;
+  
+  /**
+   * @prop {String}
+   * tenant assigned user id
+   */
   customerUserId?: string;
   firstName?: string;
   lastName?: string;

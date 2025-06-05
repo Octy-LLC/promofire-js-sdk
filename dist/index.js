@@ -5,12 +5,36 @@ const client_1 = require("./client");
 Object.defineProperty(exports, "Client", { enumerable: true, get: function () { return client_1.Client; } });
 const http_methods_enum_1 = require("./contracts/enums/http-methods.enum");
 class Promofire {
-    constructor(tenant, secret) {
-        this.client = new client_1.Client(tenant, secret);
+    constructor(options) {
+        const { secret } = options;
+        const appBuild = options.appBuild || 'unknown';
+        const appVersion = options.appVersion || 'unknown';
+        this.client = new client_1.Client({ secret, appBuild, appVersion });
     }
-    async identify(createCustomerDto) {
-        this.client = await this.client.authenticate(createCustomerDto);
-        console.log('Client: ', this.client);
+    anonify() {
+        this.client.authenticate({})
+            .then((client) => {
+            const requests = this.client.requests;
+            this.client = client;
+            requests.forEach(req => {
+                client.request(req.url, req.method, req.body)
+                    .then(req.resolve, req.reject);
+            });
+        });
+        this.client = new client_1.AuthenticatingClient(this.client);
+        return this;
+    }
+    identify(options) {
+        this.client.authenticate({ ...options })
+            .then((client) => {
+            const requests = this.client.requests;
+            this.client = client;
+            requests.forEach(req => {
+                client.request(req.url, req.method, req.body)
+                    .then(req.resolve, req.reject);
+            });
+        });
+        this.client = new client_1.AuthenticatingClient(this.client);
         return this;
     }
     async createTemplate(createTemplateDto) {

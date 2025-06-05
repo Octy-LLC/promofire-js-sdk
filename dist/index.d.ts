@@ -13,11 +13,14 @@ import { GetMyRedeemedCodesDto } from './dto/util/get-my-redeemed-codes.dto';
 import { SearchCodeTemplatesDto } from './dto/util/search-code-templates.dto';
 import { CodeRedeem } from './entities/code-redeem.entity';
 import { Code, CodesDto } from './entities/code.entity';
+import { IConstructPromofire } from './contracts/promofire/construct-promofire.contract';
+import { IAuthenticateClient } from './contracts/client/authenticate-client.contract';
 export { Client };
 export declare class Promofire {
     private client;
-    constructor(tenant: string, secret: string);
-    identify(createCustomerDto: CreateCustomerDto): Promise<Promofire>;
+    constructor(options: IConstructPromofire);
+    anonify(): Promofire;
+    identify(options: IAuthenticateClient): Promofire;
     createTemplate(createTemplateDto: CreateCodeTemplateDto): Promise<CodeTemplate>;
     updateTemplate(templateId: UUID, updateCodeTemplateDto: UpdateCodeTemplateDto): Promise<CodeTemplate>;
     getCampaigns(options: SearchCodeTemplatesDto): Promise<CodeTemplatesDto>;
