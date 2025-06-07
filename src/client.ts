@@ -1,24 +1,27 @@
+import { SDK_VERSION } from './contracts/constants/sdk.contract';
 import { IAuthenticateClient } from './contracts/client/authenticate-client.contract';
 import { IConstructAuthenticatedClientState, IConstructClientState } from './contracts/client/construct-client-state.contract';
 import { IRequestCommand } from './contracts/client/request-command.contract';
 import { BASE_URL } from './contracts/constants/urls.contract';
 import { HttpMethods } from './contracts/enums/http-methods.enum';
+import { Platforms } from './contracts/enums/platforms.enum';
 import { AlreadyAuthenticated } from './contracts/errors/already-authenticated.error';
 import { Unauthenticated } from './contracts/errors/unauthenticated.error';
 import { getOS } from './utils';
 
 export abstract class ClientState {
-  secret: string;
+  readonly secret: string;
 
-  protected sdkVersion: string;
-  protected platform: 'WEB';
-  protected device: string;
-  protected os = getOS();
-  protected appBuild: string;
-  protected appVersion: string;
+  protected readonly sdkVersion = SDK_VERSION;
+  protected readonly platform: Platforms = Platforms.WEB;
+  protected readonly device: string;
+  protected readonly os = getOS();
+  protected readonly appBuild: string;
+  protected readonly appVersion: string;
 
   constructor(options: IConstructClientState) {
     this.secret = options.secret;
+
     this.appBuild = options.appBuild || 'unknown';
     this.appVersion = options.appVersion || 'unknown';
   }
@@ -27,58 +30,33 @@ export abstract class ClientState {
   abstract request<T = any>(url: string, method: HttpMethods, body?: any): Promise<T>;
 }
 
-export class Client extends ClientState {
+export class UnAuthenticatedClient extends ClientState {
   async authenticate(options: IAuthenticateClient): Promise<AuthenticatedClient> {
-    const sdkAuthUrl = new URL('/auth/sdk', BASE_URL);
-    const presetUrl = new URL('/customers/preset', BASE_URL);
-    const createCustomerUrl = new URL('/customers', BASE_URL);
+    const authUrl = new URL('/auth/sdk/customer', BASE_URL);
 
-    const sdkAuth = await fetch(sdkAuthUrl, {
+    const token = await fetch(authUrl, {
+      body: JSON.stringify({
+        secret: this.secret,
+
+        platform: Platforms.WEB,
+        device: this.device,
+        os: this.os,
+        appBuild: this.appBuild,
+        appVersion: this.appVersion,
+        sdkVersion: this.sdkVersion,
+
+        customerUserId: options.customerUserId,
+        firstName: options.firstName,
+        lastName: options.lastName,
+        email: options.email,
+        phone: options.phone,
+      }),
       method: HttpMethods.POST,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ secret: this.secret }),
     })
-      .then(async response => await response.json());
+      .then(res => res.json())
+      .then(res => res.accessToken);
 
-    const preset = await fetch(presetUrl, {
-      method: HttpMethods.POST,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sdkAuth.accessToken}`,
-      },
-      body: JSON.stringify({ platform: 'WEB' }),
-    })
-      .then(async response => await response.json());
-
-    if (options.customerUserId) {
-      const response = await fetch(createCustomerUrl, {
-        method: HttpMethods.PUT,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${preset.accessToken}`,
-        },
-        body: JSON.stringify({
-          customerUserId: options.customerUserId,
-          platform: 'WEB',
-          device: this.device,
-          os: this.os,
-          appBuild: this.appBuild,
-          appVersion: this.appVersion,
-          sdkVersion: this.sdkVersion,
-          firstName: options.firstName,
-          lastName: options.lastName,
-          email: options.email,
-          phone: options.phone,
-        }),
-      })
-        .then(async res => await res.json());
-
-      return new AuthenticatedClient({ ...(this as any), token: response.accessToken });
-    }
-
-    return new AuthenticatedClient({ ...(this as any), token: preset.accessToken });
+    return new AuthenticatedClient({ ...(this as any), token });
   };
 
   async request(): Promise<never> {

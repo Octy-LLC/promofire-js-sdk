@@ -2,19 +2,20 @@ import { IAuthenticateClient } from './contracts/client/authenticate-client.cont
 import { IConstructAuthenticatedClientState, IConstructClientState } from './contracts/client/construct-client-state.contract';
 import { IRequestCommand } from './contracts/client/request-command.contract';
 import { HttpMethods } from './contracts/enums/http-methods.enum';
+import { Platforms } from './contracts/enums/platforms.enum';
 export declare abstract class ClientState {
-    secret: string;
-    protected sdkVersion: string;
-    protected platform: 'WEB';
-    protected device: string;
-    protected os: string;
-    protected appBuild: string;
-    protected appVersion: string;
+    readonly secret: string;
+    protected readonly sdkVersion = "0.4.0";
+    protected readonly platform: Platforms;
+    protected readonly device: string;
+    protected readonly os: string;
+    protected readonly appBuild: string;
+    protected readonly appVersion: string;
     constructor(options: IConstructClientState);
     abstract authenticate(options: IAuthenticateClient): Promise<ClientState>;
     abstract request<T = any>(url: string, method: HttpMethods, body?: any): Promise<T>;
 }
-export declare class Client extends ClientState {
+export declare class UnAuthenticatedClient extends ClientState {
     authenticate(options: IAuthenticateClient): Promise<AuthenticatedClient>;
     request(): Promise<never>;
 }

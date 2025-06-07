@@ -1,10 +1,11 @@
 {
-  "name": "promofire-js-sdk",
-  "version": "0.3.0",
-  "description": "promofire javascript sdk",
+  "name": "@octy/promofire-web-sdk",
+  "version": "0.4.0",
+  "description": "promofire web sdk",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc"
+    "prebuild": "node prebuild",
+    "build": "npm run prebuild && tsc"
   },
   "keywords": [
     "promofire",

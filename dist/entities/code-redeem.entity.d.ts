@@ -1,5 +1,5 @@
 import { UUID } from '../contracts/utils/uuid.contract';
-import { CodeTemplate } from '../aggregates/code-template.aggregate';
+import { CodeTemplate } from './code-template.entity';
 import { Platforms } from '../contracts/enums/platforms.enum';
 import { Code } from './code.entity';
 export declare class CodeRedeem {

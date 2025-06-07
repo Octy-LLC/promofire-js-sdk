@@ -1,6 +1,5 @@
-import { CodeTemplate, CodeTemplatesDto } from './aggregates/code-template.aggregate';
-import { AuthenticatedClient, AuthenticatingClient, Client, ClientState } from './client';
-import { IAuthTokens } from './contracts/auth/auth-tokens.contract';
+import { CodeTemplate, CodeTemplatesDto } from './entities/code-template.entity';
+import { AuthenticatedClient, AuthenticatingClient, UnAuthenticatedClient, ClientState } from './client';
 import { HttpMethods } from './contracts/enums/http-methods.enum';
 import { UUID } from './contracts/utils/uuid.contract';
 import { CreateCodeTemplateDto } from './dto/code-templates/create-code-template.dto';
@@ -9,15 +8,16 @@ import { CreateCodeDto } from './dto/codes/create-code.dto';
 import { CreateCodesDto } from './dto/codes/create-codes.dto';
 import { RedeemCodeDto } from './dto/codes/redeem-code.dto';
 import { UpdateCodeDto } from './dto/codes/update-code.dto';
-import { CreateCustomerDto } from './dto/customers/create-customer.dto';
-import { GetMyRedeemedCodesDto } from './dto/util/get-my-redeemed-codes.dto';
+import { GetMyRedeemedCodesDto } from './dto/codes/get-my-redeemed-codes.dto';
 import { SearchCodeTemplatesDto } from './dto/util/search-code-templates.dto';
 import { CodeRedeem } from './entities/code-redeem.entity';
 import { Code, CodesDto } from './entities/code.entity';
 import { IConstructPromofire } from './contracts/promofire/construct-promofire.contract';
 import { IAuthenticateClient } from './contracts/client/authenticate-client.contract';
+import { GetRedeemsOfMyCodesDto } from './dto/codes/get-redeems-of-my-codes.dto';
+import { PatchUpdateCustomerDto } from './dto/customers/update-customer.dto';
 
-export { Client };
+export { UnAuthenticatedClient as Client };
 
 export class Promofire {
   private client: ClientState;
@@ -27,33 +27,10 @@ export class Promofire {
     const appBuild = options.appBuild || 'unknown';
     const appVersion = options.appVersion || 'unknown';
 
-    this.client = new Client({ secret, appBuild, appVersion });
+    this.client = new UnAuthenticatedClient({ secret, appBuild, appVersion });
   }
 
-  /**
-   * Would create anonymous user.
-   */
-  anonify(): Promofire {
-    this.client.authenticate({})
-      .then((client: AuthenticatedClient) => {
-        const requests = (this.client as AuthenticatingClient).requests;
-        this.client = client;
-
-        requests.forEach(req => {
-          client.request(req.url, req.method, req.body)
-            .then(req.resolve, req.reject);
-        });
-      });
-
-    this.client = new AuthenticatingClient(this.client as any);
-
-    return this;
-  }
-
-  /**
-   * Inserts or updates existing customer in Promofire.
-   */
-  identify(options: IAuthenticateClient): Promofire {
+  activate(options?: IAuthenticateClient): Promofire {
     this.client.authenticate({ ...options })
       .then((client: AuthenticatedClient) => {
         const requests = (this.client as AuthenticatingClient).requests;
@@ -70,11 +47,11 @@ export class Promofire {
     return this;
   }
 
-  async createTemplate(createTemplateDto: CreateCodeTemplateDto): Promise<CodeTemplate> {
+  async createCampaign(createTemplateDto: CreateCodeTemplateDto): Promise<CodeTemplate> {
     return await this.client.request<CodeTemplate>('/code-templates', HttpMethods.POST, createTemplateDto);
   }
 
-  async updateTemplate(templateId: UUID, updateCodeTemplateDto: UpdateCodeTemplateDto): Promise<CodeTemplate> {
+  async updateCampaign(templateId: UUID, updateCodeTemplateDto: UpdateCodeTemplateDto): Promise<CodeTemplate> {
     return await this.client.request<CodeTemplate>(`/code-templates/${templateId}`, HttpMethods.PATCH, updateCodeTemplateDto);
   }
 
@@ -87,7 +64,7 @@ export class Promofire {
     return await this.client.request<CodeTemplate | null>(`/code-templates/${templateId}`, HttpMethods.GET);
   }
 
-  async getCurrentUserCodes(options: { limit: number, offset: number }): Promise<CodesDto | null> {
+  async getMyAvailableCodes(options: { limit: number, offset: number }): Promise<CodesDto | null> {
     const queryParams = new URLSearchParams(options as any as Record<string, string>);
     return await this.client.request<CodesDto | null>(`/codes/me?${queryParams}`, HttpMethods.GET);
   }
@@ -100,7 +77,7 @@ export class Promofire {
     return await this.client.request<Code>('/codes', HttpMethods.POST, createCodeDto);
   }
 
-  async generateBatchCode(createCodesDto: CreateCodesDto): Promise<Code[]> {
+  async generateCodesBatch(createCodesDto: CreateCodesDto): Promise<Code[]> {
     return await this.client.request<Code[]>('/codes/batch', HttpMethods.POST, createCodesDto);
   }
 
@@ -112,39 +89,21 @@ export class Promofire {
     await this.client.request<void>('/codes/redeem', HttpMethods.POST, redeemCodeDto);
   }
 
-  async createCustomer(createDto: CreateCustomerDto): Promise<IAuthTokens> {
-    const customer = await this.client.request<IAuthTokens>('/customers', HttpMethods.PUT, createDto);
-    return customer;
-  }
-
-  async getCodeRedeems(getMyRedeemedCodesDto: GetMyRedeemedCodesDto): Promise<CodeRedeem[]> {
+  async getRedeemsOfMyCode(getMyRedeemedCodesDto: GetRedeemsOfMyCodesDto): Promise<CodeRedeem[]> {
     const queryParams = new URLSearchParams(getMyRedeemedCodesDto as any as Record<string, string>);
     return await this.client.request<CodeRedeem[]>(`/codes/redeems?${queryParams}`, HttpMethods.GET);
   }
 
-  async getCurrentUserRedeems(getMyRedeemedCodesDto: GetMyRedeemedCodesDto): Promise<CodeRedeem[]> {
+  async getMyRedeems(getMyRedeemedCodesDto: GetMyRedeemedCodesDto): Promise<CodeRedeem[]> {
     const queryParams = new URLSearchParams(getMyRedeemedCodesDto as any as Record<string, string>);
     return await this.client.request<CodeRedeem[]>(`/codes/redeems/me?${queryParams}`, HttpMethods.GET);
   }
 
-  async identifyCustomerByEmail(clientDataDto: { email: string, firstName: string, lastName: string, inviteToken: string }) {
-    return await this.client.request('/auth/sign-in/invite/email', HttpMethods.POST, clientDataDto);
-  }
-
-  async identifyCustomerByGoogle(clientDataDto: { code: string, inviteToken: string }) {
-    return await this.client.request('/auth/sign-in/invite/google', HttpMethods.POST, clientDataDto);
-  }
-
-  async getCurrentUser(): Promise<any> {
+  async getMe(): Promise<any> {
     return await this.client.request('/customers/me', HttpMethods.GET);
   }
 
-  async updateCurrentUser(updateMeDto: {
-    firstName?: string,
-    lastName?: string,
-    email?: string,
-    phone?: string
-  }): Promise<any> {
+  async updateMe(updateMeDto: PatchUpdateCustomerDto): Promise<any> {
     return await this.client.request('/customers/me', HttpMethods.PATCH, updateMeDto);
   }
 

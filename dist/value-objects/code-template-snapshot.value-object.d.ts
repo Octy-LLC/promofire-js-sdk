@@ -1,5 +1,5 @@
-import { CodeTemplate } from '../aggregates/code-template.aggregate';
-export declare class CodeTemplateShapshot {
+import { CodeTemplate } from '../entities/code-template.entity';
+export declare class CodeTemplateSnapshot {
     readonly createdAt: Date;
     readonly amount: CodeTemplate['amount'];
     readonly payload: CodeTemplate['payload'];

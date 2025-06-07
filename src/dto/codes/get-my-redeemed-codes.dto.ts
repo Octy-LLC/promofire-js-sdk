@@ -4,5 +4,4 @@ export class GetMyRedeemedCodesDto {
   from: string;
   to: string;
   codeValue?: string;
-  redeemerId?: string;
 }

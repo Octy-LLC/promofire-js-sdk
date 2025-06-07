@@ -1,6 +1,5 @@
-import { CodeTemplate, CodeTemplatesDto } from './aggregates/code-template.aggregate';
-import { Client } from './client';
-import { IAuthTokens } from './contracts/auth/auth-tokens.contract';
+import { CodeTemplate, CodeTemplatesDto } from './entities/code-template.entity';
+import { UnAuthenticatedClient } from './client';
 import { UUID } from './contracts/utils/uuid.contract';
 import { CreateCodeTemplateDto } from './dto/code-templates/create-code-template.dto';
 import { UpdateCodeTemplateDto } from './dto/code-templates/update-code-template.dto';
@@ -8,51 +7,35 @@ import { CreateCodeDto } from './dto/codes/create-code.dto';
 import { CreateCodesDto } from './dto/codes/create-codes.dto';
 import { RedeemCodeDto } from './dto/codes/redeem-code.dto';
 import { UpdateCodeDto } from './dto/codes/update-code.dto';
-import { CreateCustomerDto } from './dto/customers/create-customer.dto';
-import { GetMyRedeemedCodesDto } from './dto/util/get-my-redeemed-codes.dto';
+import { GetMyRedeemedCodesDto } from './dto/codes/get-my-redeemed-codes.dto';
 import { SearchCodeTemplatesDto } from './dto/util/search-code-templates.dto';
 import { CodeRedeem } from './entities/code-redeem.entity';
 import { Code, CodesDto } from './entities/code.entity';
 import { IConstructPromofire } from './contracts/promofire/construct-promofire.contract';
 import { IAuthenticateClient } from './contracts/client/authenticate-client.contract';
-export { Client };
+import { GetRedeemsOfMyCodesDto } from './dto/codes/get-redeems-of-my-codes.dto';
+import { PatchUpdateCustomerDto } from './dto/customers/update-customer.dto';
+export { UnAuthenticatedClient as Client };
 export declare class Promofire {
     private client;
     constructor(options: IConstructPromofire);
-    anonify(): Promofire;
-    identify(options: IAuthenticateClient): Promofire;
-    createTemplate(createTemplateDto: CreateCodeTemplateDto): Promise<CodeTemplate>;
-    updateTemplate(templateId: UUID, updateCodeTemplateDto: UpdateCodeTemplateDto): Promise<CodeTemplate>;
+    activate(options?: IAuthenticateClient): Promofire;
+    createCampaign(createTemplateDto: CreateCodeTemplateDto): Promise<CodeTemplate>;
+    updateCampaign(templateId: UUID, updateCodeTemplateDto: UpdateCodeTemplateDto): Promise<CodeTemplate>;
     getCampaigns(options: SearchCodeTemplatesDto): Promise<CodeTemplatesDto>;
     getCampaignById(templateId: UUID): Promise<CodeTemplate | null>;
-    getCurrentUserCodes(options: {
+    getMyAvailableCodes(options: {
         limit: number;
         offset: number;
     }): Promise<CodesDto | null>;
     getCodeByValue(codeValue: string): Promise<Code | null>;
     generateCode(createCodeDto: CreateCodeDto): Promise<Code>;
-    generateBatchCode(createCodesDto: CreateCodesDto): Promise<Code[]>;
+    generateCodesBatch(createCodesDto: CreateCodesDto): Promise<Code[]>;
     updateCode(codeValue: string, updateCodeDto: UpdateCodeDto): Promise<Code>;
     redeemCode(redeemCodeDto: RedeemCodeDto): Promise<void>;
-    createCustomer(createDto: CreateCustomerDto): Promise<IAuthTokens>;
-    getCodeRedeems(getMyRedeemedCodesDto: GetMyRedeemedCodesDto): Promise<CodeRedeem[]>;
-    getCurrentUserRedeems(getMyRedeemedCodesDto: GetMyRedeemedCodesDto): Promise<CodeRedeem[]>;
-    identifyCustomerByEmail(clientDataDto: {
-        email: string;
-        firstName: string;
-        lastName: string;
-        inviteToken: string;
-    }): Promise<any>;
-    identifyCustomerByGoogle(clientDataDto: {
-        code: string;
-        inviteToken: string;
-    }): Promise<any>;
-    getCurrentUser(): Promise<any>;
-    updateCurrentUser(updateMeDto: {
-        firstName?: string;
-        lastName?: string;
-        email?: string;
-        phone?: string;
-    }): Promise<any>;
+    getRedeemsOfMyCode(getMyRedeemedCodesDto: GetRedeemsOfMyCodesDto): Promise<CodeRedeem[]>;
+    getMyRedeems(getMyRedeemedCodesDto: GetMyRedeemedCodesDto): Promise<CodeRedeem[]>;
+    getMe(): Promise<any>;
+    updateMe(updateMeDto: PatchUpdateCustomerDto): Promise<any>;
     deleteMe(): Promise<void>;
 }

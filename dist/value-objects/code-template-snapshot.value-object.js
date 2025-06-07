@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CodeTemplateShapshot = void 0;
-class CodeTemplateShapshot {
+exports.CodeTemplateSnapshot = void 0;
+class CodeTemplateSnapshot {
     constructor(codeTemplate) {
         this.createdAt = new Date;
         this.amount = codeTemplate.amount;
@@ -9,5 +9,5 @@ class CodeTemplateShapshot {
         this.ttl = codeTemplate.ttl;
     }
 }
-exports.CodeTemplateShapshot = CodeTemplateShapshot;
+exports.CodeTemplateSnapshot = CodeTemplateSnapshot;
 //# sourceMappingURL=code-template-snapshot.value-object.js.map

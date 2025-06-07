@@ -2,29 +2,16 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Promofire = exports.Client = void 0;
 const client_1 = require("./client");
-Object.defineProperty(exports, "Client", { enumerable: true, get: function () { return client_1.Client; } });
+Object.defineProperty(exports, "Client", { enumerable: true, get: function () { return client_1.UnAuthenticatedClient; } });
 const http_methods_enum_1 = require("./contracts/enums/http-methods.enum");
 class Promofire {
     constructor(options) {
         const { secret } = options;
         const appBuild = options.appBuild || 'unknown';
         const appVersion = options.appVersion || 'unknown';
-        this.client = new client_1.Client({ secret, appBuild, appVersion });
+        this.client = new client_1.UnAuthenticatedClient({ secret, appBuild, appVersion });
     }
-    anonify() {
-        this.client.authenticate({})
-            .then((client) => {
-            const requests = this.client.requests;
-            this.client = client;
-            requests.forEach(req => {
-                client.request(req.url, req.method, req.body)
-                    .then(req.resolve, req.reject);
-            });
-        });
-        this.client = new client_1.AuthenticatingClient(this.client);
-        return this;
-    }
-    identify(options) {
+    activate(options) {
         this.client.authenticate({ ...options })
             .then((client) => {
             const requests = this.client.requests;
@@ -37,10 +24,10 @@ class Promofire {
         this.client = new client_1.AuthenticatingClient(this.client);
         return this;
     }
-    async createTemplate(createTemplateDto) {
+    async createCampaign(createTemplateDto) {
         return await this.client.request('/code-templates', http_methods_enum_1.HttpMethods.POST, createTemplateDto);
     }
-    async updateTemplate(templateId, updateCodeTemplateDto) {
+    async updateCampaign(templateId, updateCodeTemplateDto) {
         return await this.client.request(`/code-templates/${templateId}`, http_methods_enum_1.HttpMethods.PATCH, updateCodeTemplateDto);
     }
     async getCampaigns(options) {
@@ -50,7 +37,7 @@ class Promofire {
     async getCampaignById(templateId) {
         return await this.client.request(`/code-templates/${templateId}`, http_methods_enum_1.HttpMethods.GET);
     }
-    async getCurrentUserCodes(options) {
+    async getMyAvailableCodes(options) {
         const queryParams = new URLSearchParams(options);
         return await this.client.request(`/codes/me?${queryParams}`, http_methods_enum_1.HttpMethods.GET);
     }
@@ -60,7 +47,7 @@ class Promofire {
     async generateCode(createCodeDto) {
         return await this.client.request('/codes', http_methods_enum_1.HttpMethods.POST, createCodeDto);
     }
-    async generateBatchCode(createCodesDto) {
+    async generateCodesBatch(createCodesDto) {
         return await this.client.request('/codes/batch', http_methods_enum_1.HttpMethods.POST, createCodesDto);
     }
     async updateCode(codeValue, updateCodeDto) {
@@ -69,28 +56,18 @@ class Promofire {
     async redeemCode(redeemCodeDto) {
         await this.client.request('/codes/redeem', http_methods_enum_1.HttpMethods.POST, redeemCodeDto);
     }
-    async createCustomer(createDto) {
-        const customer = await this.client.request('/customers', http_methods_enum_1.HttpMethods.PUT, createDto);
-        return customer;
-    }
-    async getCodeRedeems(getMyRedeemedCodesDto) {
+    async getRedeemsOfMyCode(getMyRedeemedCodesDto) {
         const queryParams = new URLSearchParams(getMyRedeemedCodesDto);
         return await this.client.request(`/codes/redeems?${queryParams}`, http_methods_enum_1.HttpMethods.GET);
     }
-    async getCurrentUserRedeems(getMyRedeemedCodesDto) {
+    async getMyRedeems(getMyRedeemedCodesDto) {
         const queryParams = new URLSearchParams(getMyRedeemedCodesDto);
         return await this.client.request(`/codes/redeems/me?${queryParams}`, http_methods_enum_1.HttpMethods.GET);
     }
-    async identifyCustomerByEmail(clientDataDto) {
-        return await this.client.request('/auth/sign-in/invite/email', http_methods_enum_1.HttpMethods.POST, clientDataDto);
-    }
-    async identifyCustomerByGoogle(clientDataDto) {
-        return await this.client.request('/auth/sign-in/invite/google', http_methods_enum_1.HttpMethods.POST, clientDataDto);
-    }
-    async getCurrentUser() {
+    async getMe() {
         return await this.client.request('/customers/me', http_methods_enum_1.HttpMethods.GET);
     }
-    async updateCurrentUser(updateMeDto) {
+    async updateMe(updateMeDto) {
         return await this.client.request('/customers/me', http_methods_enum_1.HttpMethods.PATCH, updateMeDto);
     }
     async deleteMe() {
