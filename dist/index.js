@@ -70,9 +70,6 @@ class Promofire {
     async updateMe(updateMeDto) {
         return await this.client.request('/customers/me', http_methods_enum_1.HttpMethods.PATCH, updateMeDto);
     }
-    async deleteMe() {
-        await this.client.request('/customers/me', http_methods_enum_1.HttpMethods.DELETE);
-    }
 }
 exports.Promofire = Promofire;
 //# sourceMappingURL=index.js.map

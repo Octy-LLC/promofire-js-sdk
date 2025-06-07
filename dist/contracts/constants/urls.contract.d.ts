@@ -1,1 +1,1 @@
-export declare const BASE_URL = "https://api.stage.promofire.io";
+export declare const BASE_URL = "https://api.promofire.io";

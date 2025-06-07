@@ -14,6 +14,7 @@ class ClientState {
         this.platform = platforms_enum_1.Platforms.WEB;
         this.os = (0, utils_1.getOS)();
         this.secret = options.secret;
+        this.device = window.navigator.userAgent || 'unknown';
         this.appBuild = options.appBuild || 'unknown';
         this.appVersion = options.appVersion || 'unknown';
     }
@@ -22,21 +23,25 @@ exports.ClientState = ClientState;
 class UnAuthenticatedClient extends ClientState {
     async authenticate(options) {
         const authUrl = new URL('/auth/sdk/customer', urls_contract_1.BASE_URL);
+        const payload = JSON.stringify({
+            secret: this.secret,
+            platform: platforms_enum_1.Platforms.WEB,
+            device: this.device,
+            os: this.os,
+            appBuild: this.appBuild,
+            appVersion: this.appVersion,
+            sdkVersion: this.sdkVersion,
+            customerUserId: options.customerUserId,
+            firstName: options.firstName,
+            lastName: options.lastName,
+            email: options.email,
+            phone: options.phone,
+        });
         const token = await fetch(authUrl, {
-            body: JSON.stringify({
-                secret: this.secret,
-                platform: platforms_enum_1.Platforms.WEB,
-                device: this.device,
-                os: this.os,
-                appBuild: this.appBuild,
-                appVersion: this.appVersion,
-                sdkVersion: this.sdkVersion,
-                customerUserId: options.customerUserId,
-                firstName: options.firstName,
-                lastName: options.lastName,
-                email: options.email,
-                phone: options.phone,
-            }),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: payload,
             method: http_methods_enum_1.HttpMethods.POST,
         })
             .then(res => res.json())
@@ -82,6 +87,10 @@ class AuthenticatedClient extends ClientState {
             method,
             body: body ? JSON.stringify(body) : undefined,
         });
+        if (response.status > 399) {
+            const json = await response.json();
+            throw new Error(json.message || 'Unknown error');
+        }
         const responseData = await response.json()
             .catch(err => {
             if (err.message.startsWith('Unexpected token'))

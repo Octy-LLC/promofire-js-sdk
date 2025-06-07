@@ -37,5 +37,4 @@ export declare class Promofire {
     getMyRedeems(getMyRedeemedCodesDto: GetMyRedeemedCodesDto): Promise<CodeRedeem[]>;
     getMe(): Promise<any>;
     updateMe(updateMeDto: PatchUpdateCustomerDto): Promise<any>;
-    deleteMe(): Promise<void>;
 }

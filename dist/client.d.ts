@@ -5,7 +5,7 @@ import { HttpMethods } from './contracts/enums/http-methods.enum';
 import { Platforms } from './contracts/enums/platforms.enum';
 export declare abstract class ClientState {
     readonly secret: string;
-    protected readonly sdkVersion = "0.4.0";
+    protected readonly sdkVersion = "0.4.1";
     protected readonly platform: Platforms;
     protected readonly device: string;
     protected readonly os: string;

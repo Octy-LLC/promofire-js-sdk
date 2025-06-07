@@ -56,6 +56,3 @@ const promofire = new Promofire(sdkData)
 - get my code redeems
 
 - get me
-
-- identify customer (upsert customer preset)
-- delete customer

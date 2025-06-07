@@ -106,8 +106,4 @@ export class Promofire {
   async updateMe(updateMeDto: PatchUpdateCustomerDto): Promise<any> {
     return await this.client.request('/customers/me', HttpMethods.PATCH, updateMeDto);
   }
-
-  async deleteMe(): Promise<void> {
-    await this.client.request<void>('/customers/me', HttpMethods.DELETE);
-  }
 }

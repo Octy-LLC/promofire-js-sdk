@@ -22,6 +22,7 @@ export abstract class ClientState {
   constructor(options: IConstructClientState) {
     this.secret = options.secret;
 
+    this.device = window.navigator.userAgent || 'unknown';
     this.appBuild = options.appBuild || 'unknown';
     this.appVersion = options.appVersion || 'unknown';
   }
@@ -34,23 +35,28 @@ export class UnAuthenticatedClient extends ClientState {
   async authenticate(options: IAuthenticateClient): Promise<AuthenticatedClient> {
     const authUrl = new URL('/auth/sdk/customer', BASE_URL);
 
+    const payload = JSON.stringify({
+      secret: this.secret,
+
+      platform: Platforms.WEB,
+      device: this.device,
+      os: this.os,
+      appBuild: this.appBuild,
+      appVersion: this.appVersion,
+      sdkVersion: this.sdkVersion,
+
+      customerUserId: options.customerUserId,
+      firstName: options.firstName,
+      lastName: options.lastName,
+      email: options.email,
+      phone: options.phone,
+    });
+
     const token = await fetch(authUrl, {
-      body: JSON.stringify({
-        secret: this.secret,
-
-        platform: Platforms.WEB,
-        device: this.device,
-        os: this.os,
-        appBuild: this.appBuild,
-        appVersion: this.appVersion,
-        sdkVersion: this.sdkVersion,
-
-        customerUserId: options.customerUserId,
-        firstName: options.firstName,
-        lastName: options.lastName,
-        email: options.email,
-        phone: options.phone,
-      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: payload,
       method: HttpMethods.POST,
     })
       .then(res => res.json())
@@ -103,6 +109,11 @@ export class AuthenticatedClient extends ClientState {
       method,
       body: body ? JSON.stringify(body) : undefined,
     });
+
+    if (response.status > 399) {
+      const json = await response.json()
+      throw new Error(json.message || 'Unknown error');
+    }
 
     const responseData = await response.json()
       .catch(err => {
