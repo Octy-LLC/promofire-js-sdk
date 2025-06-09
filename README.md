@@ -40,8 +40,6 @@ const promofire = new Promofire(sdkData)
 
 # Methods
 
-- create campaign
-- update campaign
 - get templates list
 - get templates by id
 

@@ -2,5 +2,5 @@ import { ICodePayload } from '../../contracts/code/code-payload.contract';
 import { CodeStatuses } from '../../contracts/code/code-statuses.enum';
 export declare class UpdateCodeDto {
     payload?: ICodePayload;
-    status?: CodeStatuses;
+    status?: CodeStatuses.ACTIVE | CodeStatuses.DEACTIVATED;
 }

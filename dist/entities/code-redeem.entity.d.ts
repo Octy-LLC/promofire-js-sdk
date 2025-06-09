@@ -1,13 +1,11 @@
 import { UUID } from '../contracts/utils/uuid.contract';
-import { CodeTemplate } from './code-template.entity';
 import { Platforms } from '../contracts/enums/platforms.enum';
-import { Code } from './code.entity';
 export declare class CodeRedeem {
     id: number;
-    redeemer: UUID;
-    code: Code;
-    platform?: Platforms;
-    country?: string;
-    template: CodeTemplate;
+    redeemerId: UUID;
+    code: string;
+    platform: Platforms | null;
+    country: string | null;
+    templateId: UUID;
     redeemedAt: string;
 }

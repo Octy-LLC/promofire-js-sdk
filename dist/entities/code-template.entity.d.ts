@@ -15,7 +15,3 @@ export declare class CodeTemplate {
     description: string;
     payload: ICodePayload;
 }
-export declare class CodeTemplatesDto {
-    total: number;
-    templates: CodeTemplate[];
-}

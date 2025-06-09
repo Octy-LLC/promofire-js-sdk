@@ -13,7 +13,7 @@ export abstract class ClientState {
   readonly secret: string;
 
   protected readonly sdkVersion = SDK_VERSION;
-  protected readonly platform: Platforms = Platforms.WEB;
+  readonly platform: Platforms = Platforms.WEB;
   protected readonly device: string;
   protected readonly os = getOS();
   protected readonly appBuild: string;
@@ -38,7 +38,7 @@ export class UnAuthenticatedClient extends ClientState {
     const payload = JSON.stringify({
       secret: this.secret,
 
-      platform: Platforms.WEB,
+      platform: this.platform,
       device: this.device,
       os: this.os,
       appBuild: this.appBuild,
@@ -109,6 +109,14 @@ export class AuthenticatedClient extends ClientState {
       method,
       body: body ? JSON.stringify(body) : undefined,
     });
+
+    if (response.status === 401) {
+      throw new Unauthenticated;
+    }
+
+    if (response.status === 404) {
+      return null;
+    }
 
     if (response.status > 399) {
       const json = await response.json()

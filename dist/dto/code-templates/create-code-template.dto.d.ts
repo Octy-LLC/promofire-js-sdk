@@ -1,6 +1,7 @@
+import { ICodePayload } from '../../contracts/code/code-payload.contract';
 export declare class CreateCodeTemplateDto {
     name: string;
-    payload: {};
+    payload: ICodePayload;
     amount: string;
     ttl: number;
     hasMutablePayload: boolean;

@@ -1,0 +1,17 @@
+import { UUID } from '../../contracts/utils/uuid.contract';
+
+import { CodeStatuses } from '../../contracts/code/code-statuses.enum';
+import { ICodePayload } from '../../contracts/code/code-payload.contract';
+
+export class CodeDto {
+  value: string;
+  templateId: UUID;
+  /** Should be either "Infinity" or positive string integer */
+  amount: string;
+  status: CodeStatuses;
+  ownerId: UUID;
+  expiresAt: number;
+  createdAt: string;
+  updatedAt: string;
+  payload: ICodePayload;
+}

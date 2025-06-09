@@ -1,7 +1,8 @@
-import { CodeTemplateStatuses } from "src/contracts/enums/code-template-statuses.enum";
+import { ICodePayload } from '../../contracts/code/code-payload.contract';
+import { CodeTemplateStatuses } from 'src/contracts/enums/code-template-statuses.enum';
 export declare class UpdateCodeTemplateDto {
     name: string;
-    payload: {};
+    payload: ICodePayload;
     amount: string;
     ttl: number;
     hasMutablePayload?: boolean;

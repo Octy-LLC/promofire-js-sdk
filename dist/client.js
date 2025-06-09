@@ -25,7 +25,7 @@ class UnAuthenticatedClient extends ClientState {
         const authUrl = new URL('/auth/sdk/customer', urls_contract_1.BASE_URL);
         const payload = JSON.stringify({
             secret: this.secret,
-            platform: platforms_enum_1.Platforms.WEB,
+            platform: this.platform,
             device: this.device,
             os: this.os,
             appBuild: this.appBuild,
@@ -87,6 +87,12 @@ class AuthenticatedClient extends ClientState {
             method,
             body: body ? JSON.stringify(body) : undefined,
         });
+        if (response.status === 401) {
+            throw new unauthenticated_error_1.Unauthenticated;
+        }
+        if (response.status === 404) {
+            return null;
+        }
         if (response.status > 399) {
             const json = await response.json();
             throw new Error(json.message || 'Unknown error');
