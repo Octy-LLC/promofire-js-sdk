@@ -2,7 +2,7 @@ import { SDK_VERSION } from './contracts/constants/sdk.contract';
 import { IAuthenticateClient } from './contracts/client/authenticate-client.contract';
 import { IConstructAuthenticatedClientState, IConstructClientState } from './contracts/client/construct-client-state.contract';
 import { IRequestCommand } from './contracts/client/request-command.contract';
-import { BASE_URL } from './contracts/constants/urls.contract';
+import { DEFAULT_BASE_URL } from './contracts/constants/urls.contract';
 import { HttpMethods } from './contracts/enums/http-methods.enum';
 import { Platforms } from './contracts/enums/platforms.enum';
 import { AlreadyAuthenticated } from './contracts/errors/already-authenticated.error';
@@ -12,6 +12,7 @@ import { getOS } from './utils';
 export abstract class ClientState {
   readonly secret: string;
 
+  protected readonly baseUrl: string;
   protected readonly sdkVersion = SDK_VERSION;
   readonly platform: Platforms = Platforms.WEB;
   protected readonly device: string;
@@ -22,6 +23,7 @@ export abstract class ClientState {
   constructor(options: IConstructClientState) {
     this.secret = options.secret;
 
+    this.baseUrl = options.baseUrl ?? DEFAULT_BASE_URL;
     this.device = window.navigator.userAgent || 'unknown';
     this.appBuild = options.appBuild || 'unknown';
     this.appVersion = options.appVersion || 'unknown';
@@ -33,7 +35,7 @@ export abstract class ClientState {
 
 export class UnAuthenticatedClient extends ClientState {
   async authenticate(options: IAuthenticateClient): Promise<AuthenticatedClient> {
-    const authUrl = new URL('/auth/sdk/customer', BASE_URL);
+    const authUrl = new URL('/auth/sdk/customer', this.baseUrl);
 
     const payload = JSON.stringify({
       secret: this.secret,
@@ -99,7 +101,7 @@ export class AuthenticatedClient extends ClientState {
   }
 
   async request<T = any>(path: string, method: HttpMethods, body?: any): Promise<T> {
-    const url = new URL(path, BASE_URL);
+    const url = new URL(path, this.baseUrl);
   
     const response = await fetch(url, {
       headers: {

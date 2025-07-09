@@ -7,9 +7,10 @@ const http_methods_enum_1 = require("./contracts/enums/http-methods.enum");
 class Promofire {
     constructor(options) {
         const { secret } = options;
+        const baseUrl = options.baseUrl;
         const appBuild = options.appBuild || 'unknown';
         const appVersion = options.appVersion || 'unknown';
-        this.client = new client_1.UnAuthenticatedClient({ secret, appBuild, appVersion });
+        this.client = new client_1.UnAuthenticatedClient({ secret, appBuild, appVersion, baseUrl });
     }
     activate(options) {
         this.client.authenticate({ ...options })

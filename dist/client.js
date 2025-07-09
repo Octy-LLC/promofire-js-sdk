@@ -14,6 +14,7 @@ class ClientState {
         this.platform = platforms_enum_1.Platforms.WEB;
         this.os = (0, utils_1.getOS)();
         this.secret = options.secret;
+        this.baseUrl = options.baseUrl ?? urls_contract_1.DEFAULT_BASE_URL;
         this.device = window.navigator.userAgent || 'unknown';
         this.appBuild = options.appBuild || 'unknown';
         this.appVersion = options.appVersion || 'unknown';
@@ -22,7 +23,7 @@ class ClientState {
 exports.ClientState = ClientState;
 class UnAuthenticatedClient extends ClientState {
     async authenticate(options) {
-        const authUrl = new URL('/auth/sdk/customer', urls_contract_1.BASE_URL);
+        const authUrl = new URL('/auth/sdk/customer', this.baseUrl);
         const payload = JSON.stringify({
             secret: this.secret,
             platform: this.platform,
@@ -78,7 +79,7 @@ class AuthenticatedClient extends ClientState {
         throw new already_authenticated_error_1.AlreadyAuthenticated;
     }
     async request(path, method, body) {
-        const url = new URL(path, urls_contract_1.BASE_URL);
+        const url = new URL(path, this.baseUrl);
         const response = await fetch(url, {
             headers: {
                 'Authorization': `Bearer ${this.token}`,

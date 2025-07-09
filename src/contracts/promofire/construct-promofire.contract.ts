@@ -1,5 +1,6 @@
 export interface IConstructPromofire {
-  secret: string
+  secret: string;
+  baseUrl?: string;
   appBuild?: string;
   appVersion?: string;
 }

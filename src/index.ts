@@ -26,10 +26,11 @@ export class Promofire {
 
   constructor(options: IConstructPromofire) {
     const { secret } = options;
+    const baseUrl = options.baseUrl;
     const appBuild = options.appBuild || 'unknown';
     const appVersion = options.appVersion || 'unknown';
 
-    this.client = new UnAuthenticatedClient({ secret, appBuild, appVersion });
+    this.client = new UnAuthenticatedClient({ secret, appBuild, appVersion, baseUrl });
   }
 
   activate(options?: IAuthenticateClient): Promofire {

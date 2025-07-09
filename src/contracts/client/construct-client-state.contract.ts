@@ -1,5 +1,6 @@
 export interface IConstructClientState {
   secret: string;
+  baseUrl?: string;
   appBuild?: string;
   appVersion?: string;
 }

@@ -1,6 +1,6 @@
 {
   "name": "@octy/promofire-web-sdk",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "promofire web sdk",
   "main": "dist/index.js",
   "scripts": {

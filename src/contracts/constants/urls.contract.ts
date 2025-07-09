@@ -1,1 +1,1 @@
-export const BASE_URL = 'https://api.promofire.io';
+export const DEFAULT_BASE_URL = 'https://api.promofire.io';

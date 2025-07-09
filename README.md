@@ -1,10 +1,10 @@
 # Installation
 ``` bash
-npm install promofire-js-sdk
+npm install @octy/promofire-web-sdk
 ```
 # Setup
 ``` js
-import { Promofire } from 'promofire-js-sdk';
+import { Promofire } from '@octy/promofire-web-sdk';
 
 const sdkData = {
   secret: 'YOUR_SECRET',
@@ -26,7 +26,7 @@ const promofire = new Promofire(sdkData)
 
 # Userless App Setup
 ``` js
-import { Promofire } from 'promofire-js-sdk';
+import { Promofire } from '@octy/promofire-web-sdk';
 
 const sdkData = {
   secret: 'YOUR_SECRET',
