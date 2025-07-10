@@ -6,7 +6,7 @@ import { Platforms } from './contracts/enums/platforms.enum';
 export declare abstract class ClientState {
     readonly secret: string;
     protected readonly baseUrl: string;
-    protected readonly sdkVersion = "0.5.1";
+    protected readonly sdkVersion = "0.5.2";
     readonly platform: Platforms;
     protected readonly device: string;
     protected readonly os: string;

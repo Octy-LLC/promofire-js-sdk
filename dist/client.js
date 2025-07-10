@@ -99,12 +99,7 @@ class AuthenticatedClient extends ClientState {
             throw new Error(json.message || 'Unknown error');
         }
         const responseData = await response.json()
-            .catch(err => {
-            if (err.message.startsWith('Unexpected token'))
-                return undefined;
-            else
-                throw err;
-        });
+            .catch(() => undefined);
         return responseData;
     }
 }

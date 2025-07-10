@@ -126,10 +126,7 @@ export class AuthenticatedClient extends ClientState {
     }
 
     const responseData = await response.json()
-      .catch(err => {
-        if (err.message.startsWith('Unexpected token')) return undefined;
-        else throw err;
-      });
+      .catch(() =>  undefined);
 
     return responseData;
   }
