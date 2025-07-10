@@ -6,7 +6,7 @@ import { Platforms } from './contracts/enums/platforms.enum';
 export declare abstract class ClientState {
     readonly secret: string;
     protected readonly baseUrl: string;
-    protected readonly sdkVersion = "0.5.2";
+    protected readonly sdkVersion = "0.6.0";
     readonly platform: Platforms;
     protected readonly device: string;
     protected readonly os: string;
@@ -14,7 +14,7 @@ export declare abstract class ClientState {
     protected readonly appVersion: string;
     constructor(options: IConstructClientState);
     abstract authenticate(options: IAuthenticateClient): Promise<ClientState>;
-    abstract request<T = any>(url: string, method: HttpMethods, body?: any): Promise<T>;
+    abstract request<T = any>(url: string, method: HttpMethods, body?: any): Promise<T | null | void>;
 }
 export declare class UnAuthenticatedClient extends ClientState {
     authenticate(options: IAuthenticateClient): Promise<AuthenticatedClient>;

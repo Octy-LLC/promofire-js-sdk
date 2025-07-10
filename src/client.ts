@@ -30,7 +30,7 @@ export abstract class ClientState {
   }
 
   abstract authenticate(options: IAuthenticateClient): Promise<ClientState>;
-  abstract request<T = any>(url: string, method: HttpMethods, body?: any): Promise<T>;
+  abstract request<T = any>(url: string, method: HttpMethods, body?: any): Promise<T | null | void>;
 }
 
 export class UnAuthenticatedClient extends ClientState {

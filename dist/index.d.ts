@@ -27,10 +27,10 @@ export declare class Promofire {
     getCodeByValue(codeValue: string): Promise<CodeDto | null>;
     generateCode(createCodeDto: CreateCodeDto): Promise<CodeDto>;
     generateCodesBatch(createCodesDto: CreateCodesDto): Promise<CodeDto[]>;
-    updateCode(codeValue: string, updateCodeDto: UpdateCodeDto): Promise<CodeDto>;
-    redeemCode(codeValue: string): Promise<void>;
+    updateCode(codeValue: string, updateCodeDto: UpdateCodeDto): Promise<CodeDto | null>;
+    redeemCode(codeValue: string): Promise<void | null>;
     getRedeemsOfMyCode(getMyRedeemedCodesDto: GetRedeemsOfMyCodesDto): Promise<PaginatedCodeRedeemsDto>;
     getMyRedeems(getMyRedeemedCodesDto: GetMyRedeemedCodesDto): Promise<PaginatedCodeRedeemsDto>;
     getMe(): Promise<CustomerDto>;
-    updateMe(updateMeDto: PatchUpdateCustomerDto): Promise<CustomerDto>;
+    updateMe(updateMeDto: PatchUpdateCustomerDto): Promise<CustomerDto | null>;
 }

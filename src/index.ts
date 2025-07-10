@@ -52,60 +52,90 @@ export class Promofire {
 
   async getCampaigns(options: SearchCodeTemplatesDto): Promise<PaginatedCodeTemplatesDto> {
     const queryParams = new URLSearchParams(options as any as Record<string, string>);
-    return await this.client.request<PaginatedCodeTemplatesDto>(`/code-templates?${queryParams}`, HttpMethods.GET);
+    const response = await this.client
+      .request<PaginatedCodeTemplatesDto>(`/code-templates?${queryParams}`, HttpMethods.GET);
+
+    return response as PaginatedCodeTemplatesDto;
   }
 
   async getCampaignById(id: UUID): Promise<CodeTemplate | null> {
-    return await this.client.request<CodeTemplate | null>(`/code-templates/${id}`, HttpMethods.GET);
+    const response = await this.client
+      .request<CodeTemplate | null>(`/code-templates/${id}`, HttpMethods.GET);
+
+    return response as CodeTemplate | null;
   }
 
   async getMyAvailableCodes(options: IPaginable): Promise<CodesDto | null> {
     const queryParams = new URLSearchParams(options as any as Record<string, string>);
-    return await this.client.request<CodesDto | null>(`/codes/me?${queryParams}`, HttpMethods.GET);
+    const response = await this.client
+      .request<CodesDto | null>(`/codes/me?${queryParams}`, HttpMethods.GET);
+
+    return response as CodesDto | null;
   }
 
   async getCodeByValue(codeValue: string): Promise<CodeDto | null> {
-    return await this.client.request<CodeDto | null>(`/codes/${codeValue}`, HttpMethods.GET);
+    const response = await this.client
+      .request<CodeDto | null>(`/codes/${codeValue}`, HttpMethods.GET);
+
+    return response as CodeDto | null;
   }
 
   async generateCode(createCodeDto: CreateCodeDto): Promise<CodeDto> {
-    return await this.client.request<CodeDto>('/codes', HttpMethods.POST, createCodeDto);
+    const response = await this.client
+      .request<CodeDto>('/codes', HttpMethods.POST, createCodeDto);
+    return response as CodeDto;
   }
 
   async generateCodesBatch(createCodesDto: CreateCodesDto): Promise<CodeDto[]> {
-    return await this.client.request<CodeDto[]>('/codes/batch', HttpMethods.POST, createCodesDto);
+    const response = await this.client
+      .request<CodeDto[]>('/codes/batch', HttpMethods.POST, createCodesDto);
+
+    return response as CodeDto[];
   }
 
-  async updateCode(codeValue: string, updateCodeDto: UpdateCodeDto): Promise<CodeDto> {
-    return await this.client.request<CodeDto>(`/codes/${codeValue}`, HttpMethods.PATCH, updateCodeDto);
+  async updateCode(codeValue: string, updateCodeDto: UpdateCodeDto): Promise<CodeDto | null> {
+    const response = await this.client
+      .request<CodeDto>(`/codes/${codeValue}`, HttpMethods.PATCH, updateCodeDto);
+
+    return response as CodeDto | null;
   }
 
-  async redeemCode(codeValue: string): Promise<void> {
+  async redeemCode(codeValue: string): Promise<void | null> {
     const payload: RedeemCodeDto = { codeValue, platform: this.client.platform };
-    await this.client.request<void>('/codes/redeem', HttpMethods.POST, payload);
+    return await this.client.request<void>('/codes/redeem', HttpMethods.POST, payload);
   }
 
   async getRedeemsOfMyCode(
     getMyRedeemedCodesDto: GetRedeemsOfMyCodesDto,
   ): Promise<PaginatedCodeRedeemsDto> {
     const queryParams = new URLSearchParams(getMyRedeemedCodesDto as any as Record<string, string>);
-    return await this.client
+    const response = await this.client
       .request<PaginatedCodeRedeemsDto>(`/codes/redeems?${queryParams}`, HttpMethods.GET);
+
+    return response as PaginatedCodeRedeemsDto;
   }
 
   async getMyRedeems(
     getMyRedeemedCodesDto: GetMyRedeemedCodesDto,
   ): Promise<PaginatedCodeRedeemsDto> {
     const queryParams = new URLSearchParams(getMyRedeemedCodesDto as any as Record<string, string>);
-    return await this.client
+    const response = await this.client
       .request<PaginatedCodeRedeemsDto>(`/codes/redeems/me?${queryParams}`, HttpMethods.GET);
+
+    return response as PaginatedCodeRedeemsDto;
   }
 
   async getMe(): Promise<CustomerDto> {
-    return await this.client.request<CustomerDto>('/customers/me', HttpMethods.GET);
+    const response = await this.client
+      .request<CustomerDto>('/customers/me', HttpMethods.GET);
+
+    return response as CustomerDto;
   }
 
-  async updateMe(updateMeDto: PatchUpdateCustomerDto): Promise<CustomerDto> {
-    return await this.client.request<CustomerDto>('/customers/me', HttpMethods.PATCH, updateMeDto);
+  async updateMe(updateMeDto: PatchUpdateCustomerDto): Promise<CustomerDto | null> {
+    const response = await this.client
+      .request<CustomerDto>('/customers/me', HttpMethods.PATCH, updateMeDto);
+
+    return response as CustomerDto | null;
   }
 }

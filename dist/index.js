@@ -27,46 +27,66 @@ class Promofire {
     }
     async getCampaigns(options) {
         const queryParams = new URLSearchParams(options);
-        return await this.client.request(`/code-templates?${queryParams}`, http_methods_enum_1.HttpMethods.GET);
+        const response = await this.client
+            .request(`/code-templates?${queryParams}`, http_methods_enum_1.HttpMethods.GET);
+        return response;
     }
     async getCampaignById(id) {
-        return await this.client.request(`/code-templates/${id}`, http_methods_enum_1.HttpMethods.GET);
+        const response = await this.client
+            .request(`/code-templates/${id}`, http_methods_enum_1.HttpMethods.GET);
+        return response;
     }
     async getMyAvailableCodes(options) {
         const queryParams = new URLSearchParams(options);
-        return await this.client.request(`/codes/me?${queryParams}`, http_methods_enum_1.HttpMethods.GET);
+        const response = await this.client
+            .request(`/codes/me?${queryParams}`, http_methods_enum_1.HttpMethods.GET);
+        return response;
     }
     async getCodeByValue(codeValue) {
-        return await this.client.request(`/codes/${codeValue}`, http_methods_enum_1.HttpMethods.GET);
+        const response = await this.client
+            .request(`/codes/${codeValue}`, http_methods_enum_1.HttpMethods.GET);
+        return response;
     }
     async generateCode(createCodeDto) {
-        return await this.client.request('/codes', http_methods_enum_1.HttpMethods.POST, createCodeDto);
+        const response = await this.client
+            .request('/codes', http_methods_enum_1.HttpMethods.POST, createCodeDto);
+        return response;
     }
     async generateCodesBatch(createCodesDto) {
-        return await this.client.request('/codes/batch', http_methods_enum_1.HttpMethods.POST, createCodesDto);
+        const response = await this.client
+            .request('/codes/batch', http_methods_enum_1.HttpMethods.POST, createCodesDto);
+        return response;
     }
     async updateCode(codeValue, updateCodeDto) {
-        return await this.client.request(`/codes/${codeValue}`, http_methods_enum_1.HttpMethods.PATCH, updateCodeDto);
+        const response = await this.client
+            .request(`/codes/${codeValue}`, http_methods_enum_1.HttpMethods.PATCH, updateCodeDto);
+        return response;
     }
     async redeemCode(codeValue) {
         const payload = { codeValue, platform: this.client.platform };
-        await this.client.request('/codes/redeem', http_methods_enum_1.HttpMethods.POST, payload);
+        return await this.client.request('/codes/redeem', http_methods_enum_1.HttpMethods.POST, payload);
     }
     async getRedeemsOfMyCode(getMyRedeemedCodesDto) {
         const queryParams = new URLSearchParams(getMyRedeemedCodesDto);
-        return await this.client
+        const response = await this.client
             .request(`/codes/redeems?${queryParams}`, http_methods_enum_1.HttpMethods.GET);
+        return response;
     }
     async getMyRedeems(getMyRedeemedCodesDto) {
         const queryParams = new URLSearchParams(getMyRedeemedCodesDto);
-        return await this.client
+        const response = await this.client
             .request(`/codes/redeems/me?${queryParams}`, http_methods_enum_1.HttpMethods.GET);
+        return response;
     }
     async getMe() {
-        return await this.client.request('/customers/me', http_methods_enum_1.HttpMethods.GET);
+        const response = await this.client
+            .request('/customers/me', http_methods_enum_1.HttpMethods.GET);
+        return response;
     }
     async updateMe(updateMeDto) {
-        return await this.client.request('/customers/me', http_methods_enum_1.HttpMethods.PATCH, updateMeDto);
+        const response = await this.client
+            .request('/customers/me', http_methods_enum_1.HttpMethods.PATCH, updateMeDto);
+        return response;
     }
 }
 exports.Promofire = Promofire;
